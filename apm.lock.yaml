@@ -26,3 +26,10 @@ dependencies:
   package_type: claude_skill
   deployed_files:
   - .github/skills/github-agentic-workflows
+- repo_url: webmaxru/ai-native-dev
+  host: github.com
+  virtual_path: prompts/version-bump-and-deploy.prompt.md
+  is_virtual: true
+  package_type: apm_package
+  deployed_files:
+  - .github/prompts/version-bump-and-deploy.prompt.md
