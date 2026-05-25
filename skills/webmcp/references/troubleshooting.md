@@ -12,8 +12,20 @@
 
 1. Check whether the tool name is already registered.
 2. Check whether `name` is an empty string.
-3. Check whether `description` is an empty string.
-4. If the route or page state changes, unregister stale tools before registering replacements.
+3. Check whether `name` exceeds 128 characters or contains characters other than ASCII alphanumeric, `_`, `-`, or `.`.
+4. Check whether `description` is an empty string.
+5. If the route or page state changes, unregister stale tools before registering replacements.
+
+## `registerTool()` throws `NotAllowedError`
+
+1. Check whether the page is running in a cross-origin iframe that has not been granted the `tools` Permissions Policy feature.
+2. The `tools` feature defaults to `'self'`; the embedding document must include `allow="tools"` on the iframe for cross-origin frames to call `registerTool()`.
+3. Verify that the registering document is the expected top-level origin or a same-origin frame.
+
+## `registerTool()` throws `SecurityError`
+
+1. Check the `exposedTo` array for origins that are not potentially trustworthy (e.g., `http://` addresses other than localhost, or malformed URLs).
+2. Replace any non-trustworthy origin strings with valid HTTPS origins or remove the `exposedTo` option to default to same-origin visibility only.
 
 ## Tool registered with `AbortSignal` does not appear
 
