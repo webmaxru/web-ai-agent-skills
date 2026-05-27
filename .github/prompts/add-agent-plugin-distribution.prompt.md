@@ -11,7 +11,7 @@ Add agent plugin distribution support to this repository so all skills in the `s
 Before starting, collect these values. If any are missing, ask the user:
 
 1. **Plugin name** — kebab-case identifier for the plugin (for example, `web-ai-skills`). This becomes the namespace prefix in Claude Code (`/plugin-name:skill-name`) and the install target in Copilot CLI.
-2. **Repository owner/name** — GitHub `owner/repo` (for example, `webmaxru/agent-skills`).
+2. **Repository owner/name** — GitHub `owner/repo` (for example, `webmaxru/web-ai-agent-skills`).
 3. **Author name** — display name for the plugin author.
 4. **Plugin description** — one-sentence summary of what the skills cover.
 5. **License** — license identifier (default: `MIT`).

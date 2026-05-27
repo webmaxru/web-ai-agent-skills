@@ -69,7 +69,7 @@ Use [Agent Package Manager (APM)](https://github.com/microsoft/apm) for per-skil
 
 ```bash
 apm init                                                   # once per project
-apm install webmaxru/agent-skills/skills/SKILL_NAME
+apm install webmaxru/web-ai-agent-skills/skills/SKILL_NAME
 ```
 
 ## Skills in This Repository
@@ -81,13 +81,13 @@ apm install webmaxru/agent-skills/skills/SKILL_NAME
 Install with APM:
 
 ```bash
-apm install webmaxru/agent-skills/skills/prompt-api
+apm install webmaxru/web-ai-agent-skills/skills/prompt-api
 ```
 
 Install with npm:
 
 ```bash
-npx skills add webmaxru/agent-skills --skill prompt-api
+npx skills add webmaxru/web-ai-agent-skills --skill prompt-api
 ```
 
 It covers:
@@ -115,13 +115,13 @@ Its support files are split by purpose:
 Install with APM:
 
 ```bash
-apm install webmaxru/agent-skills/skills/language-detector-api
+apm install webmaxru/web-ai-agent-skills/skills/language-detector-api
 ```
 
 Install with npm:
 
 ```bash
-npx skills add webmaxru/agent-skills --skill language-detector-api
+npx skills add webmaxru/web-ai-agent-skills --skill language-detector-api
 ```
 
 It covers:
@@ -148,13 +148,13 @@ Its support files are split by purpose:
 Install with APM:
 
 ```bash
-apm install webmaxru/agent-skills/skills/translator-api
+apm install webmaxru/web-ai-agent-skills/skills/translator-api
 ```
 
 Install with npm:
 
 ```bash
-npx skills add webmaxru/agent-skills --skill translator-api
+npx skills add webmaxru/web-ai-agent-skills --skill translator-api
 ```
 
 It covers:
@@ -181,13 +181,13 @@ Its support files are split by purpose:
 Install with APM:
 
 ```bash
-apm install webmaxru/agent-skills/skills/writing-assistance-apis
+apm install webmaxru/web-ai-agent-skills/skills/writing-assistance-apis
 ```
 
 Install with npm:
 
 ```bash
-npx skills add webmaxru/agent-skills --skill writing-assistance-apis
+npx skills add webmaxru/web-ai-agent-skills --skill writing-assistance-apis
 ```
 
 It covers:
@@ -214,13 +214,13 @@ Its support files are split by purpose:
 Install with APM:
 
 ```bash
-apm install webmaxru/agent-skills/skills/proofreader-api
+apm install webmaxru/web-ai-agent-skills/skills/proofreader-api
 ```
 
 Install with npm:
 
 ```bash
-npx skills add webmaxru/agent-skills --skill proofreader-api
+npx skills add webmaxru/web-ai-agent-skills --skill proofreader-api
 ```
 
 It covers:
@@ -247,13 +247,13 @@ Its support files are split by purpose:
 Install with APM:
 
 ```bash
-apm install webmaxru/agent-skills/skills/webmcp
+apm install webmaxru/web-ai-agent-skills/skills/webmcp
 ```
 
 Install with npm:
 
 ```bash
-npx skills add webmaxru/agent-skills --skill webmcp
+npx skills add webmaxru/web-ai-agent-skills --skill webmcp
 ```
 
 It covers:
@@ -280,13 +280,13 @@ Its support files are split by purpose:
 Install with APM:
 
 ```bash
-apm install webmaxru/agent-skills/skills/webnn
+apm install webmaxru/web-ai-agent-skills/skills/webnn
 ```
 
 Install with npm:
 
 ```bash
-npx skills add webmaxru/agent-skills --skill webnn
+npx skills add webmaxru/web-ai-agent-skills --skill webnn
 ```
 
 It covers:
