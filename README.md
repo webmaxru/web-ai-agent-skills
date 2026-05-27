@@ -60,7 +60,7 @@ Alternatively, run **Chat: Install Plugin From Source** from the Command Palette
 
 ```bash
 > /plugin marketplace add webmaxru/ai-native-dev
-> /plugin install web-ai-skills@webmaxru/ai-native-dev
+> /plugin install web-ai-skills@webmaxru-ai-native-dev
 ```
 
 ### Install Individual Skills
