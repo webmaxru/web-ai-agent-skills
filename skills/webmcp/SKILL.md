@@ -32,14 +32,15 @@ metadata:
 
 **Step 3: Implement tool registration**
 1. Read `assets/model-context-registry.template.ts` and adapt it to the framework, state model, and file layout in the workspace when using the imperative API.
-2. Register imperative tools with `navigator.modelContext.registerTool()` using a stable `name`, a positive `description`, an object `inputSchema`, and an `execute` callback.
+2. Register imperative tools with `navigator.modelContext.registerTool()` using a stable `name` (1–128 ASCII alphanumeric/`_`/`-`/`.` characters), a positive `description`, an object `inputSchema`, and an `execute` callback.
 3. Set `annotations.readOnlyHint` to `true` only for tools that do not modify state.
-4. Validate business rules inside the tool implementation even when the schema is strict, and return descriptive errors that help the agent retry with corrected input.
-5. Return tool results only after the UI and application state reflect the tool's effect.
-6. If tool availability depends on route, selection, or page state, register tools only while they are valid and unregister stale tools by aborting the `AbortController` whose signal was passed to `registerTool()`; during the Chrome 148 transition window, also call `navigator.modelContext.unregisterTool?.()` with optional chaining before aborting.
-7. For declarative tools, annotate the target `<form>` with `toolname` and `tooldescription`, and let form controls define the parameter surface.
-8. Use labels or `toolparamdescription` to produce clear parameter descriptions for declarative fields.
-9. Use `toolautosubmit` only when the page should submit automatically after the agent populates the form.
+4. Set `annotations.untrustedContentHint` to `true` when the tool's output may contain data from untrusted sources.
+5. Validate business rules inside the tool implementation even when the schema is strict, and return descriptive errors that help the agent retry with corrected input.
+6. Return tool results only after the UI and application state reflect the tool's effect.
+7. If tool availability depends on route, selection, or page state, register tools only while they are valid and unregister stale tools by aborting the `AbortController` whose signal was passed to `registerTool()`; during the Chrome 148 transition window, also call `navigator.modelContext.unregisterTool?.()` with optional chaining before aborting.
+8. For declarative tools, annotate the target `<form>` with `toolname` and `tooldescription`, and let form controls define the parameter surface.
+9. Use labels or `toolparamdescription` to produce clear parameter descriptions for declarative fields.
+10. Use `toolautosubmit` only when the page should submit automatically after the agent populates the form.
 
 **Step 4: Wire agent-driven UX safely**
 1. Preserve the normal human interaction path even when the page supports agent invocation.
@@ -61,7 +62,8 @@ metadata:
 
 ## Error Handling
 * If `navigator.modelContext` is missing, confirm the code is running in a secure browser window context and then check the preview requirements in `references/compatibility.md`.
-* If `registerTool()` throws `InvalidStateError`, check for duplicate names or empty `name` or `description` values.
+* If `registerTool()` throws `InvalidStateError`, check for duplicate names, empty `name` or `description` values, or tool names that exceed 128 characters or contain disallowed characters (only ASCII alphanumeric, `_`, `-`, `.` are allowed).
+* If `registerTool()` throws `NotAllowedError`, check whether the `tools` Permissions Policy feature is denied; cross-origin iframes need `allow="tools"` from the embedding document.
 * If `registerTool()` throws `TypeError` or JSON serialization errors, replace non-serializable or circular `inputSchema` values with plain JSON-compatible objects.
 * If an older demo or article references `provideContext`, `clearContext`, or `toolparamtitle`, treat those surfaces as obsolete for current implementations.
 * If declarative execution does not update the page correctly, read `references/declarative-api.md` and `references/troubleshooting.md` before changing the tool contract.

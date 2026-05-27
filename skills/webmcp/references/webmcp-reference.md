@@ -31,24 +31,36 @@ Use this file for the core contract before editing code.
 1. Use `navigator.modelContext.registerTool(tool)` to add one tool without clearing the existing set. Starting in Chrome 148, `registerTool()` accepts an optional `{ signal: AbortSignal }` second argument; aborting the signal unregisters the tool.
 2. To unregister a tool, first call `navigator.modelContext.unregisterTool?.(name)` with optional chaining (for browsers that still support it), then abort the `AbortController` whose signal was passed to `registerTool()`. This order ensures cleanup across both old and new browsers during the transition period.
 3. The `ModelContextTool` contract includes:
-   `name`: unique tool identifier (required).
+   `name`: unique tool identifier (required). Must be 1–128 characters using only ASCII alphanumeric characters, `_`, `-`, and `.`.
+   `title`: optional `USVString` human-readable label shown in user-agent UI; should be localized; does not affect agent routing.
    `description`: natural-language description of what the tool does and when to use it (required).
    `inputSchema`: optional JSON Schema object describing the expected input; omit when the tool takes no structured input.
    `execute`: callback invoked with the input object and a `ModelContextClient` (required).
    `annotations.readOnlyHint`: optional boolean, defaulting to false, indicating that the tool does not modify state.
+   `annotations.untrustedContentHint`: optional boolean, defaulting to false, indicating that the tool's output contains data untrusted by the registering author.
 4. The `ToolExecuteCallback` signature is `(input: object, client: ModelContextClient) => Promise<any>` and may be asynchronous.
-5. The `ModelContextClient` exposes `requestUserInteraction(callback)` for tool flows that need explicit user interaction. The `callback` argument is a zero-argument async function `() => Promise<any>` that performs the user-facing step and resolves with the interaction result.
+5. The `ModelContextClient` exposes `requestUserInteraction(callback)` for tool flows that need explicit user interaction. The `callback` is a `UserInteractionCallback`, a zero-argument async function `() => Promise<any>` that performs the user-facing step and resolves with the interaction result.
 6. Imperative tools can return structured tool output after the page has updated, including content-oriented payloads that the agent can read.
 
 ## Registration Semantics
 
 1. Tool names must be unique within the current model context.
 2. `registerTool()` throws `InvalidStateError` if a tool with the same name already exists.
-3. `registerTool()` also throws `InvalidStateError` if `name` or `description` is the empty string.
-4. When `inputSchema` exists, the current draft serializes it with JSON stringification semantics.
-5. Non-serializable or circular `inputSchema` values can throw `TypeError` or re-throw JSON serialization errors.
-6. `unregisterTool()` is removed starting Chrome 148; use the `AbortSignal` passed to `registerTool()` to control tool lifetime. During the transition window, call `unregisterTool?.()` with optional chaining before aborting the controller so both old and new browsers handle the cleanup.
-7. If the `AbortSignal` passed to `registerTool()` is already aborted at the time of the call, the browser silently skips registration and returns without throwing an error; it may optionally log a warning to the console. The tool will not appear in the registered tool set.
+3. `registerTool()` throws `InvalidStateError` if `name` is the empty string, exceeds 128 characters, or contains characters other than ASCII alphanumeric, `_`, `-`, or `.`.
+4. `registerTool()` throws `InvalidStateError` if `description` is the empty string.
+5. `registerTool()` throws `NotAllowedError` if the document is not allowed to use the `tools` Permissions Policy feature. The default allowlist is `'self'`; cross-origin iframes must be explicitly granted this feature.
+6. When `inputSchema` exists, the current draft serializes it with JSON stringification semantics.
+7. Non-serializable or circular `inputSchema` values can throw `TypeError` or re-throw JSON serialization errors.
+8. `unregisterTool()` is removed starting Chrome 148; use the `AbortSignal` passed to `registerTool()` to control tool lifetime. During the transition window, call `unregisterTool?.()` with optional chaining before aborting the controller so both old and new browsers handle the cleanup.
+9. If the `AbortSignal` passed to `registerTool()` is already aborted at the time of the call, the browser silently skips registration and returns without throwing an error; it may optionally log a warning to the console. The tool will not appear in the registered tool set.
+10. The second argument to `registerTool()` also accepts `exposedTo`: an array of origin URL strings that control which documents in the page tree can see the tool. Each origin must be potentially trustworthy; passing an invalid or non-trustworthy origin throws `SecurityError`.
+
+## Events
+
+1. `ModelContext` fires a `toolchange` event (via `ontoolchange`) whenever a tool is registered or unregistered in the current model context.
+2. `toolchange` fires on the `ModelContext` of the registering document and propagates to same-origin or explicitly exposed-to documents in the same page tree.
+3. The timing of `toolchange` relative to tasks queued after `registerTool()` is not guaranteed; treat it as asynchronous notification only.
+4. `toolactivated`, `toolcancel`, and the declarative pseudo-classes are preview-only events distinct from `toolchange`; see `references/declarative-api.md` and `references/compatibility.md`.
 
 ## Declarative API
 

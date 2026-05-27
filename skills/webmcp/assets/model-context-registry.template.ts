@@ -8,10 +8,12 @@ type ToolContextClient = {
 
 type ToolDefinition = {
   name: string;
+  title?: string;
   description: string;
   inputSchema?: JsonSchema;
   annotations?: {
     readOnlyHint?: boolean;
+    untrustedContentHint?: boolean;
   };
   execute(input: Record<string, unknown>, client: ToolContextClient): Promise<ToolResult> | ToolResult;
 };
