@@ -1,10 +1,10 @@
 ---
 name: webmcp
-description: Implements and debugs browser WebMCP integrations in JavaScript or TypeScript web apps. Use when exposing imperative tools through navigator.modelContext, annotating HTML forms for declarative tools, handling agent-invoked form flows, or validating WebMCP behavior in the current Chrome preview. Don't use for server-side MCP servers, REST tool backends, or non-browser providers.
+description: Implements and debugs browser WebMCP integrations in JavaScript or TypeScript web apps. Use when exposing imperative tools through document.modelContext (with a navigator.modelContext fallback), annotating HTML forms for declarative tools, handling agent-invoked form flows, or validating WebMCP behavior in the current Chrome preview. Don't use for server-side MCP servers, REST tool backends, or non-browser providers.
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.2"
+  version: "1.3"
 ---
 
 # WebMCP
@@ -32,15 +32,16 @@ metadata:
 
 **Step 3: Implement tool registration**
 1. Read `assets/model-context-registry.template.ts` and adapt it to the framework, state model, and file layout in the workspace when using the imperative API.
-2. Register imperative tools with `navigator.modelContext.registerTool()` using a stable `name` (1–128 ASCII alphanumeric/`_`/`-`/`.` characters), a positive `description`, an object `inputSchema`, and an `execute` callback.
-3. Set `annotations.readOnlyHint` to `true` only for tools that do not modify state.
-4. Set `annotations.untrustedContentHint` to `true` when the tool's output may contain data from untrusted sources.
-5. Validate business rules inside the tool implementation even when the schema is strict, and return descriptive errors that help the agent retry with corrected input.
-6. Return tool results only after the UI and application state reflect the tool's effect.
-7. If tool availability depends on route, selection, or page state, register tools only while they are valid and unregister stale tools by aborting the `AbortController` whose signal was passed to `registerTool()`; during the Chrome 148 transition window, also call `navigator.modelContext.unregisterTool?.()` with optional chaining before aborting.
-8. For declarative tools, annotate the target `<form>` with `toolname` and `tooldescription`, and let form controls define the parameter surface.
-9. Use labels or `toolparamdescription` to produce clear parameter descriptions for declarative fields.
-10. Use `toolautosubmit` only when the page should submit automatically after the agent populates the form.
+2. Resolve the model context with the feature-detection pattern `const modelContext = document.modelContext || navigator.modelContext;` and guard subsequent registration on its presence. Prefer `document.modelContext` (the current surface) and keep `navigator.modelContext` only as a fallback for older Chrome 146–149 builds.
+3. Register imperative tools with `modelContext.registerTool()` using a stable `name` (1–128 ASCII alphanumeric/`_`/`-`/`.` characters), a positive `description`, an object `inputSchema`, and an `execute` callback.
+4. Set `annotations.readOnlyHint` to `true` only for tools that do not modify state.
+5. Set `annotations.untrustedContentHint` to `true` when the tool's output may contain data from untrusted sources.
+6. Validate business rules inside the tool implementation even when the schema is strict, and return descriptive errors that help the agent retry with corrected input.
+7. Return tool results only after the UI and application state reflect the tool's effect.
+8. If tool availability depends on route, selection, or page state, register tools only while they are valid and unregister stale tools by aborting the `AbortController` whose signal was passed to `registerTool()`; during the Chrome 148 transition window, also call `modelContext.unregisterTool?.()` with optional chaining before aborting.
+9. For declarative tools, annotate the target `<form>` with `toolname` and `tooldescription`, and let form controls define the parameter surface.
+10. Use labels or `toolparamdescription` to produce clear parameter descriptions for declarative fields.
+11. Use `toolautosubmit` only when the page should submit automatically after the agent populates the form.
 
 **Step 4: Wire agent-driven UX safely**
 1. Preserve the normal human interaction path even when the page supports agent invocation.
@@ -61,7 +62,8 @@ metadata:
 8. Run the workspace build, typecheck, or tests after editing.
 
 ## Error Handling
-* If `navigator.modelContext` is missing, confirm the code is running in a secure browser window context and then check the preview requirements in `references/compatibility.md`.
+* If both `document.modelContext` and `navigator.modelContext` are missing, confirm the code is running in a secure browser window context and then check the preview requirements in `references/compatibility.md`.
+* If only `navigator.modelContext` is present, the page is running on an older Chrome 146–149 preview build; keep the `document.modelContext || navigator.modelContext` fallback in place but plan to drop `navigator.modelContext` once the deprecation window closes.
 * If `registerTool()` throws `InvalidStateError`, check for duplicate names, empty `name` or `description` values, or tool names that exceed 128 characters or contain disallowed characters (only ASCII alphanumeric, `_`, `-`, `.` are allowed).
 * If `registerTool()` throws `NotAllowedError`, check whether the `tools` Permissions Policy feature is denied; cross-origin iframes need `allow="tools"` from the embedding document.
 * If `registerTool()` throws `TypeError` or JSON serialization errors, replace non-serializable or circular `inputSchema` values with plain JSON-compatible objects.

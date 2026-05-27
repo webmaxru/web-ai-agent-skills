@@ -1,12 +1,14 @@
 # WebMCP Troubleshooting
 
-## `navigator.modelContext` is undefined
+## `document.modelContext` (and `navigator.modelContext`) is undefined
 
-1. Confirm the code runs in a browser window context, not on the server.
-2. Confirm the page is in a secure context.
-3. Confirm the target Chrome build meets the preview version requirement.
-4. Confirm `chrome://flags/#enable-webmcp-testing` is enabled when using the preview.
-5. If the feature must run in a worker or headlessly, stop and redirect the design because WebMCP does not support that mode.
+1. Resolve the context with the feature-detection pattern `const modelContext = document.modelContext || navigator.modelContext;` instead of reading either property directly.
+2. Confirm the code runs in a browser window context, not on the server.
+3. Confirm the page is in a secure context.
+4. Confirm the target Chrome build meets the preview version requirement.
+5. Confirm `chrome://flags/#enable-webmcp-testing` is enabled when using the preview.
+6. If only `navigator.modelContext` is present, the page is running on Chrome 146\u2013149; the deprecated `navigator.modelContext` fallback in the pattern above will pick it up. On Chrome 150+, prefer `document.modelContext`.
+7. If the feature must run in a worker or headlessly, stop and redirect the design because WebMCP does not support that mode.
 
 ## `registerTool()` throws `InvalidStateError`
 

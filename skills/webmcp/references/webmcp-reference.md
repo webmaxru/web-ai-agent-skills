@@ -22,14 +22,16 @@ Use this file for the core contract before editing code.
 
 ## Core Exposure Model
 
-1. WebMCP is exposed through `navigator.modelContext`.
-2. `navigator.modelContext` is a secure-context, window-only API.
-3. `Navigator` exposes a `modelContext` getter that returns a `ModelContext` instance.
+1. WebMCP is exposed through `document.modelContext`.
+2. `document.modelContext` is a secure-context, window-only API and is scoped per-`Document`.
+3. `Document` exposes a `modelContext` getter that returns a `ModelContext` instance for that document.
+4. The earlier `navigator.modelContext` getter is deprecated as of Chrome `150.0.7861.0` and will be removed in a future Chrome release; it remains available for now so older preview builds keep working.
+5. Use the feature-detection pattern `const modelContext = document.modelContext || navigator.modelContext;` so the same code works on Chrome 150+ and on older 146–149 builds during the transition window. Background: WebML CG [issue 173](https://github.com/webmachinelearning/webmcp/issues/173), spec [PR #184](https://github.com/webmachinelearning/webmcp/pull/184), and demo migration in [GoogleChromeLabs/webmcp-tools PR #189](https://github.com/GoogleChromeLabs/webmcp-tools/pull/189/changes).
 
 ## Imperative API
 
-1. Use `navigator.modelContext.registerTool(tool)` to add one tool without clearing the existing set. Starting in Chrome 148, `registerTool()` accepts an optional `{ signal: AbortSignal }` second argument; aborting the signal unregisters the tool.
-2. To unregister a tool, first call `navigator.modelContext.unregisterTool?.(name)` with optional chaining (for browsers that still support it), then abort the `AbortController` whose signal was passed to `registerTool()`. This order ensures cleanup across both old and new browsers during the transition period.
+1. Resolve the context once per document with `const modelContext = document.modelContext || navigator.modelContext;` and then call `modelContext.registerTool(tool)` to add one tool without clearing the existing set. Starting in Chrome 148, `registerTool()` accepts an optional `{ signal: AbortSignal }` second argument; aborting the signal unregisters the tool.
+2. To unregister a tool, first call `modelContext.unregisterTool?.(name)` with optional chaining (for browsers that still support it), then abort the `AbortController` whose signal was passed to `registerTool()`. This order ensures cleanup across both old and new browsers during the transition period.
 3. The `ModelContextTool` contract includes:
    `name`: unique tool identifier (required). Must be 1–128 characters using only ASCII alphanumeric characters, `_`, `-`, and `.`.
    `title`: optional `USVString` human-readable label shown in user-agent UI; should be localized; does not affect agent routing.

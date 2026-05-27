@@ -1,7 +1,17 @@
 lockfile_version: '1'
-generated_at: '2026-03-29T12:52:45.406824+00:00'
-apm_version: 0.7.9
+generated_at: '2026-05-27T12:01:41.305567+00:00'
+apm_version: 0.12.1
 dependencies:
+- repo_url: webmaxru/ai-native-dev
+  host: github.com
+  resolved_commit: 95fe8995827b19d1f9b49c5667ce0c6e205327ee
+  virtual_path: prompts/version-bump-and-deploy.prompt.md
+  is_virtual: true
+  deployed_files:
+  - .github/prompts/version-bump-and-deploy.prompt.md
+  deployed_file_hashes:
+    .github/prompts/version-bump-and-deploy.prompt.md: sha256:10ebeed1b37e36c384329f6764b46268e5a877d682d0c432b29495e2d1169439
+  content_hash: sha256:e13ab845332c9a696fb21d53abfbd037a2af26e364e2bd2afac3a51c562bb2e4
 - repo_url: webmaxru/ai-native-dev
   host: github.com
   resolved_commit: e57f4524bf0ab766295ae5fac5deca9d24dcc723
@@ -9,7 +19,8 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .github/skills/agent-package-manager
+  - .agents/skills/agent-package-manager
+  content_hash: sha256:23703369f67a877630aae5b99c3e8c44282046485078acad7e4b3dc61afd54f9
 - repo_url: webmaxru/ai-native-dev
   host: github.com
   resolved_commit: e57f4524bf0ab766295ae5fac5deca9d24dcc723
@@ -17,7 +28,8 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .github/skills/agent-skill-deploy
+  - .agents/skills/agent-skill-deploy
+  content_hash: sha256:259c6df42c8e886c48f3e4a3593d185fbeb184b788da625351981a91b895d6be
 - repo_url: webmaxru/ai-native-dev
   host: github.com
   resolved_commit: e57f4524bf0ab766295ae5fac5deca9d24dcc723
@@ -25,11 +37,5 @@ dependencies:
   is_virtual: true
   package_type: claude_skill
   deployed_files:
-  - .github/skills/github-agentic-workflows
-- repo_url: webmaxru/ai-native-dev
-  host: github.com
-  virtual_path: prompts/version-bump-and-deploy.prompt.md
-  is_virtual: true
-  package_type: apm_package
-  deployed_files:
-  - .github/prompts/version-bump-and-deploy.prompt.md
+  - .agents/skills/github-agentic-workflows
+  content_hash: sha256:8c58e7e5f1713c0e2d2373a15d785f0e363484720d6d7b5f1ef005b8e7ef564a

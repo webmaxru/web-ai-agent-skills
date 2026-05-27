@@ -17,6 +17,7 @@ const IGNORED_DIRS = new Set([
 ]);
 
 const WEBMCP_MARKERS = [
+  "document.modelContext",
   "navigator.modelContext",
   "registerTool(",
   "unregisterTool(",
