@@ -39,7 +39,7 @@ All skills are available as a single agent plugin (`web-ai-skills`) through the 
 
 ```bash
 > /plugin marketplace add webmaxru/ai-native-dev
-> /plugin install web-ai-skills@webmaxru/ai-native-dev
+> /plugin install web-ai-skills@webmaxru-ai-native-dev
 ```
 
 **VS Code (GitHub Copilot)**
