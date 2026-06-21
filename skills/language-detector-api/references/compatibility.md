@@ -25,8 +25,7 @@ Language Detector API support is rollout-sensitive. Treat browser support, previ
 
 ## Microsoft Edge notes
 
-* Microsoft Edge documents the API as a developer preview in Dev or Canary starting with version `147.0.3897.0`.
-* Edge currently requires enabling the `#edge-language-detection-api` flag.
+* Microsoft Edge supports the Language Detector API starting with version `148`, without requiring any flags.
 * Edge documents an on-device model download on first use and supports `monitor` for surfacing download progress.
 * Edge documentation emphasizes that the model is shared across websites in the browser after download.
 * Edge warns that results can be inaccurate or unreliable for certain inputs, especially short text.
