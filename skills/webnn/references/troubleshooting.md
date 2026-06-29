@@ -18,6 +18,7 @@
 * Confirm the graph uses supported operators and data types for the selected backend.
 * Use `context.opSupportLimits()` when the graph depends on backend-specific support.
 * Reduce the graph to a minimal reproducible operation chain before changing broader application logic.
+* Add optional `label` properties to operator options (e.g., `{ label: "my-relu" }`) to produce more diagnosable error messages when `build()` or `dispatch()` fails. Labels appear in runtime error messages where available.
 
 ## `dispatch()` appears to do nothing
 
