@@ -42,22 +42,27 @@ export function registerWebMcpTools(tools: ToolDefinition[]) {
 
   // Registration is asynchronous on Chrome 151+: `registerTool()` returns a
   // Promise that resolves once the tool is visible to getTools() across the
-  // frame tree. `await` stays backward compatible with older builds that
-  // returned void synchronously, and the try/catch handles both synchronous
-  // throws (older builds, locally-known failures) and Promise rejections
-  // (Chrome 151+ asynchronous failures). `dispose()` stays synchronous so it
-  // can be used directly as framework effect cleanup while registration is
-  // still settling; await `ready` when you need registration to be complete.
-  const ready = (async () => {
-    for (const tool of tools) {
+  // frame tree. Register the tools concurrently with Promise.all so the total
+  // wait is bounded by the slowest registration instead of the sum of all of
+  // them. Each tool keeps its own try/catch so the registrations stay
+  // independent — one failing tool never blocks the others (a bare Promise.all
+  // would otherwise reject and abandon the rest on the first failure). `await`
+  // stays backward compatible with older builds that returned void
+  // synchronously, and the try/catch handles both synchronous throws (older
+  // builds, locally-known failures) and Promise rejections (Chrome 151+
+  // asynchronous failures). `dispose()` stays synchronous so it can be used
+  // directly as framework effect cleanup while registration is still settling;
+  // await `ready` when you need registration to be complete.
+  const ready = Promise.all(
+    tools.map(async (tool) => {
       try {
         await modelContext.registerTool(tool, { signal: controller.signal });
         registeredNames.push(tool.name);
       } catch (error) {
         console.error(`Failed to register WebMCP tool "${tool.name}":`, error);
       }
-    }
-  })();
+    }),
+  ).then(() => {});
 
   return {
     ready,
