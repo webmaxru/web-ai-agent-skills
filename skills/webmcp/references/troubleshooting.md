@@ -10,6 +10,13 @@
 6. If only `navigator.modelContext` is present, the page is running on Chrome 146\u2013149; the deprecated `navigator.modelContext` fallback in the pattern above will pick it up. On Chrome 150+, prefer `document.modelContext`.
 7. If the feature must run in a worker or headlessly, stop and redirect the design because WebMCP does not support that mode.
 
+## `registerTool()` failures are not caught (Chrome 151+)
+
+1. Starting in Chrome `151.0.7922.0`, `registerTool()` returns a `Promise<void>`, so failures can arrive as a Promise rejection instead of a synchronous throw.
+2. Await the call inside a `try`/`catch`: `await modelContext.registerTool(tool, { signal })`. This catches both synchronous throws on older builds and Promise rejections on Chrome 151+, so it is backward compatible.
+3. If you cannot await directly (for example inside a synchronous framework effect), wrap registration in an async IIFE or attach a `.catch()` handler so rejections are not lost as unhandled promise rejections; keep `controller.abort()` cleanup synchronous.
+4. The Promise resolves only once the tool is visible to `getTools()` across the frame tree, so await it when later logic depends on the tool already being registered.
+
 ## `registerTool()` throws `InvalidStateError`
 
 1. Check whether the tool name is already registered.
