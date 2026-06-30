@@ -4,7 +4,7 @@ description: Implements and debugs browser WebMCP integrations in JavaScript or 
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.3"
+  version: "1.4"
 ---
 
 # WebMCP
@@ -33,7 +33,7 @@ metadata:
 **Step 3: Implement tool registration**
 1. Read `assets/model-context-registry.template.ts` and adapt it to the framework, state model, and file layout in the workspace when using the imperative API.
 2. Resolve the model context with the feature-detection pattern `const modelContext = document.modelContext || navigator.modelContext;` and guard subsequent registration on its presence. Prefer `document.modelContext` (the current surface) and keep `navigator.modelContext` only as a fallback for older Chrome 146–149 builds.
-3. Register imperative tools with `modelContext.registerTool()` using a stable `name` (1–128 ASCII alphanumeric/`_`/`-`/`.` characters), a positive `description`, an object `inputSchema`, and an `execute` callback.
+3. Register imperative tools by awaiting `modelContext.registerTool()` inside a `try`/`catch`, using a stable `name` (1–128 ASCII alphanumeric/`_`/`-`/`.` characters), a positive `description`, an object `inputSchema`, and an `execute` callback. On Chrome 151+ the call returns a `Promise<void>` that resolves when the tool is available across the frame tree; `await` keeps the same code working on older builds that registered synchronously.
 4. Set `annotations.readOnlyHint` to `true` only for tools that do not modify state.
 5. Set `annotations.untrustedContentHint` to `true` when the tool's output may contain data from untrusted sources.
 6. Validate business rules inside the tool implementation even when the schema is strict, and return descriptive errors that help the agent retry with corrected input.
@@ -64,6 +64,7 @@ metadata:
 ## Error Handling
 * If both `document.modelContext` and `navigator.modelContext` are missing, confirm the code is running in a secure browser window context and then check the preview requirements in `references/compatibility.md`.
 * If only `navigator.modelContext` is present, the page is running on an older Chrome 146–149 preview build; keep the `document.modelContext || navigator.modelContext` fallback in place but plan to drop `navigator.modelContext` once the deprecation window closes.
+* Await `registerTool()` inside a `try`/`catch`. On Chrome `151.0.7922.0`+ it returns a `Promise<void>` that rejects on failure; older builds returned synchronously and threw. The same `await` + `try`/`catch` catches both, so the error checks below apply whether the failure surfaces as a synchronous throw or a Promise rejection.
 * If `registerTool()` throws `InvalidStateError`, check for duplicate names, empty `name` or `description` values, or tool names that exceed 128 characters or contain disallowed characters (only ASCII alphanumeric, `_`, `-`, `.` are allowed).
 * If `registerTool()` throws `NotAllowedError`, check whether the `tools` Permissions Policy feature is denied; cross-origin iframes need `allow="tools"` from the embedding document.
 * If `registerTool()` throws `TypeError` or JSON serialization errors, replace non-serializable or circular `inputSchema` values with plain JSON-compatible objects.

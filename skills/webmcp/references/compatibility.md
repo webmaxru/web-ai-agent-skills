@@ -16,6 +16,7 @@ Use this file when setup, browser support, or preview-only behaviors affect impl
 5. WebMCP is still an evolving Community Group specification rather than a standards-track recommendation.
 6. Starting in Chrome `148.0.7757.0`, `registerTool()` accepts an optional `{ signal: AbortSignal }` second argument and `unregisterTool()` is removed; use `AbortController` to manage tool lifetime on Chrome `148` and later.
 7. Starting in Chrome `150.0.7861.0`, the `modelContext` getter moved from `Navigator` to `Document`. `navigator.modelContext` is deprecated and will be removed in a future Chrome release. Resolve the context with `const modelContext = document.modelContext || navigator.modelContext;` so the same code keeps working on Chrome 146–149 and on Chrome 150+. See WebML CG [issue 173](https://github.com/webmachinelearning/webmcp/issues/173), spec [PR #184](https://github.com/webmachinelearning/webmcp/pull/184), and the demo migration in [GoogleChromeLabs/webmcp-tools PR #189](https://github.com/GoogleChromeLabs/webmcp-tools/pull/189/changes).
+8. Starting in Chrome `151.0.7922.0`, `registerTool()` returns a `Promise<void>` instead of `void`, resolving once the tool is available to `getTools()` across the frame tree. Await the call inside a `try`/`catch`; `await` keeps working on older builds that registered synchronously, so the pattern is backward compatible. See WebML CG [issue 175](https://github.com/webmachinelearning/webmcp/issues/175) and the demo migration in [GoogleChromeLabs/webmcp-tools PR #228](https://github.com/GoogleChromeLabs/webmcp-tools/pull/228).
 
 ## Execution Context Limits
 
@@ -25,7 +26,7 @@ Use this file when setup, browser support, or preview-only behaviors affect impl
 
 ## Draft Versus Preview Differences
 
-1. The imperative API surface around `document.modelContext` (with the deprecated `navigator.modelContext` fallback), `registerTool()`, and `ModelContextClient.requestUserInteraction()` is more stable than the declarative surface. Note that `unregisterTool()` is removed in Chrome 148 in favour of the `AbortSignal` option, and the `modelContext` getter moved from `Navigator` to `Document` in Chrome 150.
+1. The imperative API surface around `document.modelContext` (with the deprecated `navigator.modelContext` fallback), `registerTool()`, and `ModelContextClient.requestUserInteraction()` is more stable than the declarative surface. Note that `unregisterTool()` is removed in Chrome 148 in favour of the `AbortSignal` option, the `modelContext` getter moved from `Navigator` to `Document` in Chrome 150, and `registerTool()` returns a `Promise<void>` starting in Chrome 151 (await it inside a `try`/`catch`).
 2. Declarative WebMCP is not yet fully specified.
 3. Current preview implementations include additional declarative details for form attributes, submit interception, events, and CSS pseudo-classes.
 4. Keep imperative integrations aligned to the stable API shape, but treat declarative behaviors as compatibility-sensitive features until the spec stabilizes.

@@ -40,12 +40,27 @@ export function registerWebMcpTools(tools: ToolDefinition[]) {
   const controller = new AbortController();
   const registeredNames: string[] = [];
 
-  for (const tool of tools) {
-    modelContext.registerTool(tool, { signal: controller.signal });
-    registeredNames.push(tool.name);
-  }
+  // Registration is asynchronous on Chrome 151+: `registerTool()` returns a
+  // Promise that resolves once the tool is visible to getTools() across the
+  // frame tree. `await` stays backward compatible with older builds that
+  // returned void synchronously, and the try/catch handles both synchronous
+  // throws (older builds, locally-known failures) and Promise rejections
+  // (Chrome 151+ asynchronous failures). `dispose()` stays synchronous so it
+  // can be used directly as framework effect cleanup while registration is
+  // still settling; await `ready` when you need registration to be complete.
+  const ready = (async () => {
+    for (const tool of tools) {
+      try {
+        await modelContext.registerTool(tool, { signal: controller.signal });
+        registeredNames.push(tool.name);
+      } catch (error) {
+        console.error(`Failed to register WebMCP tool "${tool.name}":`, error);
+      }
+    }
+  })();
 
   return {
+    ready,
     dispose() {
       // Transitional: unregisterTool is removed in Chrome 148+; signal abort handles unregistration.
       // Call both during the transition window for cross-version compatibility.
