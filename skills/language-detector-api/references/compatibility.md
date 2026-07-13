@@ -11,11 +11,8 @@ Language Detector API support is rollout-sensitive. Treat browser support, previ
 
 ## Chrome notes
 
-* The Language Detector API works in Chrome on desktop only. Chrome for Android and iOS are not supported.
+* The Language Detector API works in Chrome on desktop only. The Language Detector and Translator APIs are not supported on Chrome for Android, iOS, or any mobile platform.
 * Chrome documents support beginning with milestone `138`.
-* The Language Detector and Translator APIs are desktop-only in Chrome; they are not supported on Chrome for Android, iOS, or any mobile platform.
-* Chrome documents per-language availability checking via `availability()` starting with Chrome `132`.
-* The Language Detector API works in Chrome on desktop only. Chrome for Android and iOS are not supported.
 * Chrome documents the API as part of its built-in AI platform family.
 * Chrome guidance notes that the model is downloaded on demand and might already be present because other browser features can use it.
 * Chrome recommends checking support with `'LanguageDetector' in self` and using `availability()` before `create()`.
@@ -29,6 +26,7 @@ Language Detector API support is rollout-sensitive. Treat browser support, previ
 * Edge documents an on-device model download on first use and supports `monitor` for surfacing download progress.
 * Edge documentation emphasizes that the model is shared across websites in the browser after download.
 * Edge warns that results can be inaccurate or unreliable for certain inputs, especially short text.
+* Note: Browser compatibility tables derived from MDN data (including at developer.chrome.com) may list Edge as unsupported. The authoritative source for Edge support is the Microsoft Edge developer documentation, which confirms support from version `148`.
 
 ## Secure context and frame rules
 
