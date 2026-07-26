@@ -15,7 +15,6 @@ Language Detector API support is rollout-sensitive. Treat browser support, previ
 * Chrome documents support beginning with milestone `138`.
 * The Language Detector and Translator APIs are desktop-only in Chrome; they are not supported on Chrome for Android, iOS, or any mobile platform.
 * Chrome documents per-language availability checking via `availability()` starting with Chrome `132`.
-* The Language Detector API works in Chrome on desktop only. Chrome for Android and iOS are not supported.
 * Chrome documents the API as part of its built-in AI platform family.
 * Chrome guidance notes that the model is downloaded on demand and might already be present because other browser features can use it.
 * Chrome recommends checking support with `'LanguageDetector' in self` and using `availability()` before `create()`.
@@ -43,6 +42,7 @@ Language Detector API support is rollout-sensitive. Treat browser support, previ
 * A first successful `create()` can require user activation if it needs to initiate a model download.
 * The initial download can take noticeable time and should be surfaced in the UI when the feature depends on immediate readiness.
 * Browsers can continue or preserve model download state independently from any one page.
+* The `downloadprogress` event's `loaded` property has browser-specific semantics: Chrome treats it as a 0–1 fraction (use `e.loaded * 100` for percentage), while Edge treats `loaded` and `total` as byte counts (use `(event.loaded / event.total) * 100`). Write handlers that accommodate both by checking whether `total` is available and positive before dividing.
 
 ## TypeScript and typings
 
