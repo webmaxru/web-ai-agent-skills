@@ -41,6 +41,7 @@ Language Detector API support is rollout-sensitive. Treat browser support, previ
 * A first successful `create()` can require user activation if it needs to initiate a model download.
 * The initial download can take noticeable time and should be surfaced in the UI when the feature depends on immediate readiness.
 * Browsers can continue or preserve model download state independently from any one page.
+* The `downloadprogress` event's `loaded` property has browser-specific semantics: Chrome treats it as a 0–1 fraction (use `e.loaded * 100` for percentage), while Edge treats `loaded` and `total` as byte counts (use `(event.loaded / event.total) * 100`). Write handlers that accommodate both by checking whether `total` is available and positive before dividing.
 
 ## TypeScript and typings
 
