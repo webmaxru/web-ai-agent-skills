@@ -4,7 +4,7 @@ description: Implements and debugs browser Translator API integrations in JavaSc
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.3"
+  version: "1.4"
 ---
 
 # Translator API
@@ -53,7 +53,8 @@ metadata:
 5. Use `measureInputUsage()` when large inputs can exceed session quota.
 6. Treat same-language or best-fit identity translations as valid outcomes instead of forcing a fallback when the translated result matches the input.
 7. Chunk or queue long-running product workflows deliberately; translation requests are not a substitute for general summarization, writing, or chat tasks.
-8. Do not route generic cloud translation, document localization pipelines, or server-side batch translation through this API; switch to the approved service or runtime when the task is not browser on-device translation.
+8. Create the translator as soon as the language pair and user intent are clear, destroy it when the surface no longer needs it, and cache translations for repeated identical input and language pair.
+9. Do not route generic cloud translation, document localization pipelines, or server-side batch translation through this API; switch to the approved service or runtime when the task is not browser on-device translation.
 
 **Step 5: Validate behavior**
 1. Execute `node scripts/find-translator-targets.mjs .` to confirm that the intended app boundary and Translator API markers still resolve to the edited integration surface.

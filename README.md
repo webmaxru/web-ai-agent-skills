@@ -104,6 +104,7 @@ Its support files are split by purpose:
 - `references/examples.md` for valid prompt shapes and implementation patterns
 - `references/compatibility.md` for availability, flags, typings, and breaking-change mapping
 - `references/polyfills.md` for native-first polyfill strategies and backend configuration
+- `references/best-practices.md` for session timing, session reuse, streaming, quota, and AI UX do and don't guidance
 - `references/troubleshooting.md` for runtime failure cases such as missing `LanguageModel`, iframe issues, and stale session cleanup
 - `assets/language-model-service.template.ts` for a reusable wrapper template
 - `scripts/find-frontend-targets.mjs` for deterministic scanning of likely web entry points and Prompt API markers

@@ -4,7 +4,7 @@ description: Implements and debugs browser Summarizer, Writer, and Rewriter inte
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.3"
+  version: "1.4"
 ---
 
 # Writing Assistance APIs
@@ -36,7 +36,7 @@ metadata:
 1. Read `assets/writing-assistance-session.template.ts` and adapt it to the framework, state model, and file layout in the workspace.
 2. Gate session creation behind the API's `availability()` method using the same create options that will be used at runtime.
 3. Treat `availability()` as a capability check, not a guarantee that creation will succeed without user interaction or download time.
-4. Create sessions only after user activation when creation may initiate a download.
+4. Create sessions only after user activation when creation may initiate a download, and start creation as soon as user intent is clear instead of waiting for the final submit action.
 5. Use the `monitor` option during `create()` when the UI needs download progress.
 6. Use `AbortController` for cancelable create and run calls, and call `destroy()` when the session is no longer needed.
 7. Recreate the session instead of mutating options after creation; session options are fixed per instance.
@@ -49,7 +49,9 @@ metadata:
 4. Use the batch methods when the feature needs the full result before continuing, and use the streaming methods when the UI should reveal output incrementally.
 5. Pass `sharedContext` only for persistent session-wide guidance, and pass per-call `context` only for request-specific background detail.
 6. Keep language options explicit when the feature depends on supported input, context, or output languages.
-7. Do not route generic chatbot, tool-calling, or open-ended assistant tasks through these APIs; switch to the Prompt API or another approved capability when the task is not summarization, writing, or rewriting.
+7. Keep the UI interactive while generation is in flight, expose a stop control, and make generated or rewritten text reviewable and reversible before it replaces user content.
+8. Cache results for repeated identical inputs instead of re-running the same generation.
+9. Do not route generic chatbot, tool-calling, or open-ended assistant tasks through these APIs; switch to the Prompt API or another approved capability when the task is not summarization, writing, or rewriting.
 
 **Step 5: Validate behavior**
 1. Execute `node scripts/find-writing-assistance-targets.mjs .` to confirm that the intended app boundary and API markers still resolve to the edited integration surface.

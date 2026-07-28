@@ -4,7 +4,7 @@ description: Implements and debugs browser Proofreader API integrations in JavaS
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Proofreader API
@@ -45,7 +45,8 @@ metadata:
 3. Render both `correctedInput` and the structured `corrections` array when the product needs visible diffs or selective acceptance.
 4. Use `measureInputUsage()` before expensive proofreading only when the feature needs quota-aware behavior or large-input preflight.
 5. Keep expected input languages explicit when the feature depends on supported language routing.
-6. Do not use Proofreader as a general chat, summarization, or rewriting surface; switch to the correct built-in API when the task is not proofreading.
+6. Create the proofreader as soon as user intent is clear, destroy it when the editing surface is gone, keep corrections reviewable and reversible, and cache results for unchanged input.
+7. Do not use Proofreader as a general chat, summarization, or rewriting surface; switch to the correct built-in API when the task is not proofreading.
 
 **Step 5: Validate behavior**
 1. Execute `node scripts/find-proofreader-targets.mjs .` to confirm that the intended app boundary and Proofreader markers still resolve to the edited integration surface.

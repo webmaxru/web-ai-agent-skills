@@ -4,7 +4,7 @@ description: Implements and debugs browser Language Detector API integrations in
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Language Detector API
@@ -51,7 +51,8 @@ metadata:
 4. Preserve the full ordered result list when the product needs ranked candidates, and apply any confidence threshold or `und` handling in product logic instead of truncating silently.
 5. Treat the trailing `und` result as meaningful uncertainty, not as a defect to remove.
 6. Use `measureInputUsage()` when quota or input-size budgeting affects the flow.
-7. Do not route translation, summarization, or generic chat tasks through this API; switch to Translator, Writing Assistance APIs, Prompt API, or another approved capability when the task is not language detection.
+7. Create the detector as soon as user intent is clear, destroy it when the surface no longer needs it, and cache detection results for repeated identical input.
+8. Do not route translation, summarization, or generic chat tasks through this API; switch to Translator, Writing Assistance APIs, Prompt API, or another approved capability when the task is not language detection.
 
 **Step 5: Validate behavior**
 1. Execute `node scripts/find-language-detector-targets.mjs .` to confirm that the intended app boundary and Language Detector API markers still resolve to the edited integration surface.
