@@ -17,6 +17,7 @@
 3. Confirm that the browser implementation supports the Prompt API features the app is requesting.
 4. Confirm that the device meets the current browser's hardware and storage requirements.
 5. If `expectedInputs` includes `{ type: "audio" }` on Chrome, confirm the device has a GPU with strictly more than 4 GB of VRAM; Chrome does not support audio input on CPU-only configurations.
+6. On Edge, if the device performance class is Medium or Low and Phi-4-mini is unavailable, test whether enabling the **Enable prerelease on-device language model** flag (Edge 150.0.4070+) makes Aion-1.0-Instruct available; that model supports CPU-only inferencing on lower-class hardware.
 
 ## `availability()` returns `downloadable`
 
@@ -64,6 +65,13 @@
 2. Call `destroy()` when leaving the feature, route, or component.
 3. Reset or clone sessions when the app needs a fresh conversation branch.
 4. Use the compatibility helpers from the wrapper template to read context metrics and register overflow handlers across browser versions.
+
+## `QuotaExceededError`
+
+1. Chrome throws `QuotaExceededError` when the new prompt is too large to process even after the browser removes as many earlier conversation turns as possible.
+2. The error carries a `requested` property (token count of the rejected input) and a `contextWindow` property (maximum token count the session can hold).
+3. To avoid this error, call `session.measureContextUsage()` before prompting and compare the result against `session.contextWindow`.
+4. If the prompt is too large, reduce the input, summarize earlier conversation history, or start a fresh session with only the needed context.
 
 ## Removed model parameters
 
