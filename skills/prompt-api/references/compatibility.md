@@ -11,21 +11,23 @@ Use this reference when the feature must support multiple Prompt API generations
 
 ## Browser Availability Snapshot
 
-1. Chrome documents the web Prompt API as an origin-trial feature in Chrome 138 and requires on-device model support on desktop-class hardware.
+1. Chrome documents the web Prompt API as available in Chrome on supported desktop hardware. Only sampling parameters (`topK`, `temperature`) have a separate origin trial (Chrome 148); the core API does not require an origin trial.
 2. Chrome page integrations use Gemini Nano and currently document support on Windows 10 or 11, macOS 13+, Linux, and Chromebook Plus devices on supported ChromeOS builds.
 3. Chrome hardware requirements: at least 22 GB of free storage on the Chrome profile volume, and either a GPU with strictly more than 4 GB of VRAM or a CPU with 16 GB or more of RAM and 4 or more CPU cores. Chrome note: Prompt API with audio input requires a GPU; the CPU fallback does not apply when `expectedInputs` includes `{ type: "audio" }`.
 4. Edge documents the Prompt API as a developer preview in Canary or Dev starting with version `138.0.3309.2`.
-5. Edge page integrations currently target the built-in Phi-4-mini model and require Windows 10 or 11 or macOS 13.3 or later, at least 20 GB of free storage on the Edge profile volume (model deleted if drops below 10 GB), and at least 5.5 GB of VRAM.
-6. Both browser docs treat model download as a separate readiness step that can require significant disk space and an unmetered network for the initial download.
+5. Edge page integrations default to the built-in Phi-4-mini model and require Windows 10 or 11 or macOS 13.3 or later, at least 20 GB of free storage on the Edge profile volume (model deleted if drops below 10 GB), and at least 5.5 GB of VRAM.
+6. Starting with Edge version 150.0.4070, the prerelease Aion-1.0-Instruct model is also available. Aion-1.0-Instruct is smaller and faster than Phi-4-mini and supports CPU-only inferencing, making the Prompt API accessible on devices with a Medium or Low performance class that cannot run Phi-4-mini.
+7. Both browser docs treat model download as a separate readiness step that can require significant disk space and an unmetered network for the initial download.
 
 ## Browser Setup Notes
 
 1. Chrome documents `chrome://flags/#optimization-guide-on-device-model` and `chrome://flags/#prompt-api-for-gemini-nano-multimodal-input` for localhost testing.
 2. Chrome documents `chrome://on-device-internals` for checking the current downloaded model size.
-3. Edge documents enabling the `Prompt API for Phi mini` flag in `edge://flags/` and checking `edge://on-device-internals` for a device performance class of `High` or greater.
-4. Chrome and Edge both document download progress monitoring through the `monitor` callback on `LanguageModel.create()`.
-5. The Prompt API remains unavailable in workers, and cross-origin iframes still require `allow="language-model"`.
-6. User-supplied update for this skill: extension pages and offscreen pages can expose the native Prompt API even when a page integration still needs polyfill or preview handling.
+3. Edge documents enabling the `Prompt API for on-device language model` flag in `edge://flags/` and checking `edge://on-device-internals` for a device performance class of `High` or greater.
+4. On Edge, devices with a Medium or Low performance class can access the Prompt API using the prerelease Aion-1.0-Instruct model (Edge 150.0.4070+). To enable Aion-1.0-Instruct, set the **Enable prerelease on-device language model** flag in `edge://flags/`. Confirm the model is active by checking **Model Status** in `edge://on-device-internals`.
+5. Chrome and Edge both document download progress monitoring through the `monitor` callback on `LanguageModel.create()`.
+6. The Prompt API remains unavailable in workers, and cross-origin iframes still require `allow="language-model"`.
+7. User-supplied update for this skill: extension pages and offscreen pages can expose the native Prompt API even when a page integration still needs polyfill or preview handling.
 
 ## Typings
 
