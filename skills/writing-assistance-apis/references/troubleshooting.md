@@ -77,6 +77,18 @@ Remediation:
 1. Retry only after the document is active again.
 2. Recreate the session after a major route or lifecycle transition if needed.
 
+## Run call throws `NotReadableError`
+
+Likely causes:
+
+* the output was filtered by the user agent because it was detected to be harmful, inaccurate, offensive, or nonsensical
+
+Remediation:
+
+1. Do not retry the same input automatically; the same input is likely to produce the same filtered result.
+2. Surface a user-visible message that the request could not be completed.
+3. Optionally, offer the user a way to rephrase or shorten the input before trying again.
+
 ## Streaming stops unexpectedly
 
 Likely causes:
