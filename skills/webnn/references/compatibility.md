@@ -14,7 +14,8 @@ WebNN remains experimental. Treat browser support and backend behavior as an exp
 ## Execution context requirements
 
 * Secure context is required.
-* `Window` and all `Worker` contexts are supported: `DedicatedWorker`, `SharedWorker`, and `ServiceWorker`.
+* `Window` and `DedicatedWorker` contexts are supported from the earliest milestones.
+* `SharedWorker` and `ServiceWorker` contexts are supported from the January 2026 CRD snapshot (see [#823](https://github.com/webmachinelearning/webnn/pull/823)). Confirm target browser support before relying on SharedWorker or ServiceWorker execution.
 * Non-browser, server-side, or headless-only environments do not expose WebNN directly.
 
 ## Platform backend notes
