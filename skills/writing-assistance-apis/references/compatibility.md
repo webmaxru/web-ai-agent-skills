@@ -12,10 +12,13 @@ Writing Assistance APIs remain browser-specific and rollout-sensitive. Treat sup
 ## Microsoft Edge preview notes
 
 * Microsoft Edge documents the Writing Assistance APIs as a developer preview in Canary or Dev starting with version `138.0.3309.2`.
-* Edge currently documents preview enablement through separate flags for Summarizer, Writer, and Rewriter.
+* The Summarizer API is enabled by default in Edge 138.0.3309.2 and later. The Writer and Rewriter APIs require enabling flags in `edge://flags`:
+  * In Edge 150 and later: **Writer API for on-device language model** and **Rewriter API for on-device language model**.
+  * In Edge 138–149: **Writer API for Phi mini** and **Rewriter API for Phi mini**.
 * Edge preview guidance currently targets Windows 10 or 11 and macOS 13.3+.
-* Edge preview guidance currently requires at least 20 GB free storage, at least 5.5 GB VRAM, and an unmetered connection for the initial model download.
-* Edge exposes device-readiness details through `edge://on-device-internals`.
+* Edge preview guidance currently requires at least 20 GB free storage, at least 5.5 GB VRAM, and an unmetered connection for the initial model download (for the default Phi-4-mini model).
+* Edge exposes device-readiness details through `edge://on-device-internals`. Check the **Device performance class** value to determine which model path is available.
+* Edge 150.0.4070 and later also supports the prerelease **Aion-1.0-Instruct** model, which runs on devices with a Medium or Low device performance class (including devices with no discrete GPU, via CPU-inferencing). Enable it via the **Enable prerelease on-device language model** flag in `edge://flags`. When enabled, Aion-1.0-Instruct overrides Phi-4-mini as the default model for the Writing Assistance APIs.
 
 ## Chrome notes
 
