@@ -20,10 +20,10 @@ const SEMANTIC_EMBEDDER_MARKERS = [
   "SemanticEmbedder",
   "SemanticEmbedder.create(",
   "SemanticEmbedder.availability(",
-  ".embed(",
   "taskType",
+  "retrieval-document",
+  "retrieval-query",
   "embeddings[0].values",
-  'allow="semantic-embedder"',
 ];
 
 const PRIORITY_FILES = new Map([
