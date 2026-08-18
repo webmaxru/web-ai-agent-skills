@@ -75,9 +75,9 @@
 
 ## Removed model parameters
 
-1. The spec now officially marks `LanguageModel.params()` as EXPERIMENTAL: extension and experimental contexts only. Remove any dependence on it entirely for web page integrations.
-2. The spec now officially marks `topK` and `temperature` in `create()` and as session attributes as EXPERIMENTAL: extension and experimental contexts only. Remove any feature logic that expects these to affect session behavior in web page contexts.
-3. Chrome docs confirm these are "Only available when using the Prompt API for Chrome Extensions." Edge still documents them as web page options, but the spec-normative EXPERIMENTAL/extension-only classification takes precedence for portable code.
+1. The spec officially marks `LanguageModel.params()` as EXPERIMENTAL: extension and experimental contexts only. Remove any dependence on it entirely for web page integrations.
+2. The spec now marks `topK` and `temperature` in `create()` options and as session attributes as DEPRECATED: extension contexts only (reclassified from the earlier EXPERIMENTAL status). Remove any feature logic that expects these to affect session behavior in web page contexts.
+3. Chrome docs confirm these are "Only available when using the Prompt API for Chrome Extensions."
 4. Keep app-level behavior aligned to the portable API surface even if a browser preview page or extension build still documents these fields.
 
 ## Polyfill and extension mismatches

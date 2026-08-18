@@ -26,16 +26,16 @@ metadata:
 4. Read `references/polyfills.md` when the feature needs concrete package installation or backend configuration examples for Prompt API or Task API polyfills.
 5. Verify that the feature runs in a secure window context and that the `language-model` permissions-policy allows access from the current frame.
 6. If the integration must run in a Web Worker or other non-window context, stop and explain the platform limitation.
-7. Choose the session shape the feature needs: `prompt()`, `promptStreaming()`, `initialPrompts`, `append()`, `measureContextUsage()`, `tools`, or `responseConstraint`.
+7. Choose the session shape the feature needs: `prompt()`, `promptStreaming()`, `initialPrompts`, `append()`, `measureContextUsage()`, or `responseConstraint`. If the feature needs tool-calling, note that `tools` is EXPERIMENTAL (experimental contexts only) in the spec and must be gated with feature detection or limited to origin-trial or extension contexts.
 8. If the project uses TypeScript, add or preserve typings that cover the Prompt API surface used by the project.
 
 **Step 3: Implement a guarded session wrapper**
 1. Read `assets/language-model-service.template.ts` and adapt it to the framework, state model, and file layout in the workspace.
-2. Gate session creation behind `LanguageModel.availability()` using the same creation options that the feature will use at runtime, including expected modalities and tools.
+2. Gate session creation behind `LanguageModel.availability()` using the same creation options that the feature will use at runtime, including expected modalities. Do not pass `tools` to `availability()` in portable page code since `tools` is EXPERIMENTAL.
 3. Create sessions only after user activation when model download or instantiation may begin.
 4. Use `AbortController` for cancelable prompts and call `destroy()` when the session is no longer needed.
 5. If the feature runs in a cross-origin iframe, require `allow="language-model"` on the embedding iframe.
-6. Do not depend on `params()`, `topK`, or `temperature`; the spec marks them EXPERIMENTAL and extension-only, so portable web page integrations must not require them.
+6. Do not depend on `params()`, `topK`, or `temperature`; the spec now marks `topK` and `temperature` as DEPRECATED (extension contexts only), so portable web page integrations must not require them.
 7. Treat `availability()` as a passive capability check: if it reports `downloading` before user activation, do not assume the current page initiated that download or lock the UI into an app-started busy state.
 
 **Step 4: Wire UX and fallback behavior**
@@ -55,7 +55,7 @@ metadata:
 ## Error Handling
 * If `LanguageModel` is missing, prefer progressive enhancement with a maintained Prompt API polyfill or a non-AI fallback instead of inventing a custom compatibility layer.
 * If `availability()` returns `downloading` before the app has called `create()`, treat it as passive browser state. Only surface live progress and block prompt submission when the app itself has started `LanguageModel.create()`.
-* If `availability()` or `prompt()` throws `NotSupportedError`, align the creation and prompt options with the actual modalities, languages, message roles, and tools used by the feature.
+* If `availability()` or `prompt()` throws `NotSupportedError`, align the creation and prompt options with the actual modalities, languages, and message roles used by the feature. If `tools` was passed to `availability()` or `create()`, note that `tools` is EXPERIMENTAL and may not be supported in the current browser context.
 * If the feature must run in Web Workers, redirect the integration to a window context because the Prompt API is not available in workers.
 * If the feature lives in a cross-origin iframe, require `allow="language-model"` from the embedding page before continuing.
 * If `node scripts/find-frontend-targets.mjs .` cannot run, identify the browser app boundary manually and continue only after a single target app is clear.

@@ -59,6 +59,7 @@ export interface PromptLanguageModel {
     },
   ): ReadableStream<string>;
   append(input: PromptInput, options?: { signal?: AbortSignal }): Promise<void>;
+  // Required by the current spec; older browser builds may not expose it — probe before use.
   measureContextUsage?(
     input: PromptInput,
     options?: {
@@ -67,6 +68,7 @@ export interface PromptLanguageModel {
       omitResponseConstraintInput?: boolean;
     },
   ): Promise<number>;
+  // DEPRECATED: extension contexts only. Fall back here only for very old browser builds.
   measureInputUsage?(
     input: PromptInput,
     options?: {
@@ -77,13 +79,17 @@ export interface PromptLanguageModel {
   ): Promise<number>;
   clone(options?: { signal?: AbortSignal }): Promise<PromptLanguageModel>;
   destroy(): void;
+  // Required by the current spec; use compatibility helpers for older builds.
   readonly contextUsage?: number;
-  readonly inputUsage?: number;
-  readonly contextWindowMeasure?: number;
   readonly contextWindow?: number;
+  // DEPRECATED: extension contexts only.
+  readonly inputUsage?: number;
   readonly inputQuota?: number;
   oncontextoverflow?: ((event: Event) => void) | null;
+  // Compatibility aliases (user-supplied names for older builds).
+  readonly contextWindowMeasure?: number;
   contextOverflow?: ((event: Event) => void) | null;
+  // DEPRECATED: extension contexts only.
   onquotaoverflow?: ((event: Event) => void) | null;
 }
 
@@ -91,12 +97,14 @@ export interface PromptLanguageModelStatic {
   availability(options?: {
     expectedInputs?: PromptExpected[];
     expectedOutputs?: PromptExpected[];
+    // EXPERIMENTAL: only in experimental contexts — omit for portable page code.
     tools?: PromptTool[];
   }): Promise<string>;
   create(options?: {
     expectedInputs?: PromptExpected[];
     expectedOutputs?: PromptExpected[];
     initialPrompts?: PromptMessage[];
+    // EXPERIMENTAL: only in experimental contexts — gate with feature detection.
     tools?: PromptTool[];
     signal?: AbortSignal;
     monitor?: (monitor: PromptMonitor) => void;
