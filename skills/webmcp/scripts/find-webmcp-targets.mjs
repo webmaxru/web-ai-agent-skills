@@ -21,6 +21,8 @@ const WEBMCP_MARKERS = [
   "navigator.modelContext",
   "registerTool(",
   "unregisterTool(",
+  "getTools(",
+  "executeTool(",
   "toolname=",
   "tooldescription=",
   "toolautosubmit",
