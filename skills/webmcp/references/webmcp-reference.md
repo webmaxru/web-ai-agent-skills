@@ -25,7 +25,7 @@ Use this file for the core contract before editing code.
 1. WebMCP is exposed through `document.modelContext`.
 2. `document.modelContext` is a secure-context, window-only API and is scoped per-`Document`.
 3. `Document` exposes a `modelContext` getter that returns a `ModelContext` instance for that document.
-4. The earlier `navigator.modelContext` getter is deprecated as of Chrome `150.0.7861.0` and will be removed in a future Chrome release; it remains available for now so older preview builds keep working.
+4. The earlier `navigator.modelContext` getter is deprecated and retained only as a fallback for older preview builds.
 5. Use the feature-detection pattern `const modelContext = document.modelContext || navigator.modelContext;` so the same code works on Chrome 150+ and on older 146–149 builds during the transition window. Background: WebML CG [issue 173](https://github.com/webmachinelearning/webmcp/issues/173), spec [PR #184](https://github.com/webmachinelearning/webmcp/pull/184), and demo migration in [GoogleChromeLabs/webmcp-tools PR #189](https://github.com/GoogleChromeLabs/webmcp-tools/pull/189/changes).
 
 ## Imperative API
@@ -37,12 +37,51 @@ Use this file for the core contract before editing code.
    `title`: optional `USVString` human-readable label shown in user-agent UI; should be localized; does not affect agent routing.
    `description`: natural-language description of what the tool does and when to use it (required).
    `inputSchema`: optional JSON Schema object describing the expected input; omit when the tool takes no structured input.
-   `execute`: callback invoked with the input object and a `ModelContextClient` (required).
+   `execute`: callback invoked with the input object and `ToolExecuteCallbackOptions` (required).
    `annotations.readOnlyHint`: optional boolean, defaulting to false, indicating that the tool does not modify state.
    `annotations.untrustedContentHint`: optional boolean, defaulting to false, indicating that the tool's output contains data untrusted by the registering author.
-4. The `ToolExecuteCallback` signature is `(input: object, client: ModelContextClient) => Promise<any>` and may be asynchronous.
-5. The `ModelContextClient` exposes `requestUserInteraction(callback)` for tool flows that need explicit user interaction. The `callback` is a `UserInteractionCallback`, a zero-argument async function `() => Promise<any>` that performs the user-facing step and resolves with the interaction result.
-6. Imperative tools can return structured tool output after the page has updated, including content-oriented payloads that the agent can read.
+4. Starting in Chrome `153.0.8009.0`, the `ToolExecuteCallback` signature is `(input: object, options: ToolExecuteCallbackOptions) => Promise<any>`, and `options.signal` is always present.
+5. The browser creates a fresh execution `AbortController` for each invocation. When the user or agent cancels through the caller's `executeTool(..., { signal })` signal, the tool's execution signal aborts.
+6. Destroying the caller document also cancels its pending invocation and aborts the execution signal in the tool's document.
+7. Cancellation rejects the caller's `executeTool()` promise with the caller signal's abort reason. If the tool callback later resolves or rejects, that settlement is ignored.
+8. Pass the execution signal to abort-aware work such as `fetch()` and check it between stages of custom long-running work.
+9. Unregistering a tool does not abort executions already in flight on Chrome 153+. Keep registration lifecycle cleanup separate from per-call execution cancellation.
+10. Imperative tools can return structured tool output after the page has updated, including content-oriented payloads that the agent can read.
+
+### Cancellation Example
+
+```js
+await document.modelContext.registerTool({
+  name: "fetch_tool",
+  description: "Fetch the text content of a URL and stream the response.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "The URL to fetch." },
+    },
+    required: ["url"],
+  },
+  execute: async ({ url }, { signal }) => {
+    const response = await fetch(url, { signal });
+    if (!response.ok) {
+      throw new Error(`Fetch failed with status ${response.status}.`);
+    }
+
+    const output = document.querySelector("pre");
+    if (!response.body || !output) {
+      throw new Error("Streaming output is unavailable.");
+    }
+
+    const stream = response.body.pipeThrough(new TextDecoderStream());
+
+    for await (const chunk of stream) {
+      output.textContent += chunk;
+    }
+
+    return "Success";
+  },
+});
+```
 
 ## Registration Semantics
 
@@ -57,7 +96,8 @@ Use this file for the core contract before editing code.
 9. If the `AbortSignal` passed to `registerTool()` is already aborted at the time of the call, the browser silently skips registration and returns without throwing an error; it may optionally log a warning to the console. The tool will not appear in the registered tool set.
 10. The second argument to `registerTool()` also accepts `exposedTo`: an array of origin URL strings that control which documents in the page tree can see the tool. Each origin must be potentially trustworthy; passing an invalid or non-trustworthy origin throws `SecurityError`.
 11. Starting in Chrome `151.0.7922.0`, `registerTool()` returns a `Promise<void>` that resolves once the tool is registered across the frame tree and is visible to `getTools()` in other documents. Earlier builds returned `void` synchronously. Cross-origin iframe integration shares tools across the frame tree, which makes registration fundamentally asynchronous even though the failure conditions remain locally known.
-12. The failure conditions above are known synchronously (they depend only on the local per-document tool cache), but they may surface either as a synchronous throw or as a Promise rejection depending on the build. Await `registerTool()` inside a `try`/`catch` so both paths are caught; this also stays forward compatible with future asynchronous failure cases. Background: WebML CG [issue 175](https://github.com/webmachinelearning/webmcp/issues/175) and demo migration in [GoogleChromeLabs/webmcp-tools PR #228](https://github.com/GoogleChromeLabs/webmcp-tools/pull/228).
+12. The failure conditions above are known synchronously (they depend only on the local per-document tool cache), but they may surface either as a synchronous throw or as a Promise rejection depending on the build. Await `registerTool()` inside a `try`/`catch` so both paths are caught; this also stays forward compatible with future asynchronous failure cases.
+13. Starting in Chrome `153.0.8009.0`, removing a registration does not abort an execution that has already started.
 
 ## Events
 
@@ -87,5 +127,5 @@ Use this file for the core contract before editing code.
 ## Current Draft Gaps
 
 1. Declarative WebMCP is not yet as completely specified as the imperative API.
-2. `requestUserInteraction()` is defined at a high level, but some algorithmic details are still sparse.
+2. User prompting and elicitation do not yet have a standardized imperative callback in the current `execute(input, { signal })` contract.
 3. Security, privacy, and accessibility guidance exists, but it remains relatively high level.

@@ -10,12 +10,21 @@
 6. If only `navigator.modelContext` is present, the page is running on Chrome 146\u2013149; the deprecated `navigator.modelContext` fallback in the pattern above will pick it up. On Chrome 150+, prefer `document.modelContext`.
 7. If the feature must run in a worker or headlessly, stop and redirect the design because WebMCP does not support that mode.
 
-## `registerTool()` failures are not caught (Chrome 151+)
+## `registerTool()` failures are not caught
 
 1. Starting in Chrome `151.0.7922.0`, `registerTool()` returns a `Promise<void>`, so failures can arrive as a Promise rejection instead of a synchronous throw.
 2. Await the call inside a `try`/`catch`: `await modelContext.registerTool(tool, { signal })`. This catches both synchronous throws on older builds and Promise rejections on Chrome 151+, so it is backward compatible.
 3. If you cannot await directly (for example inside a synchronous framework effect), wrap registration in an async IIFE or attach a `.catch()` handler so rejections are not lost as unhandled promise rejections; keep `controller.abort()` cleanup synchronous.
 4. The Promise resolves only once the tool is visible to `getTools()` across the frame tree, so await it when later logic depends on the tool already being registered.
+
+## Tool cancellation does not stop work
+
+1. On Chrome `153.0.8009.0` or later, accept the always-present `{ signal }` as the second argument to the imperative tool's `execute` callback.
+2. Pass the signal to `fetch()` and other abort-aware operations.
+3. For work that is not abort-aware, check `signal.aborted` between stages and throw `signal.reason` when canceled.
+4. Do not confuse the execution signal with the registration signal: the former cancels one call, while the latter controls tool availability.
+5. Do not unregister and re-register a tool to cancel a call. Chrome 153+ intentionally leaves in-flight executions running when registration ends.
+6. If testing with the GoogleChromeLabs polyfill from PR #321, use it for local declarative cancellation only; its local imperative and remote execution paths do not fully model the Chrome 153 signal contract.
 
 ## `registerTool()` throws `InvalidStateError`
 
@@ -79,7 +88,8 @@
 
 1. Remove any use of `provideContext` or `clearContext`.
 2. Remove any use of `toolparamtitle`.
-3. Align the integration with the current WebMCP surface instead of reviving removed names.
+3. Replace `execute(input, client)` examples with `execute(input, { signal })` for Chrome 153+; do not call `client.requestUserInteraction()` from that second argument.
+4. Align the integration with the current WebMCP surface instead of reviving removed names.
 
 ## Deterministic validation is hard
 

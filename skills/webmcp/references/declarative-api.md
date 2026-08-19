@@ -39,6 +39,32 @@ Use this file when the page already has a form-centric user flow or when agent-d
 4. The preview applies `:tool-submit-active` to the submit control while the agent-driven form interaction is active.
 5. Treat these events and pseudo-classes as preview-only capabilities, not as the portable baseline.
 
+## Cancelling Declarative Execution
+
+1. When an in-page agent invokes a declarative tool with `document.modelContext.executeTool(tool, input, { signal })`, aborting the caller's signal cancels the pending form execution.
+2. Handle the rejected execution promise as cancellation. Current Chrome demo and polyfill code checks the caller signal's `aborted` state and stops the agent loop instead of returning the abort as a tool error.
+3. Expect the declarative form's active state to be cleaned up and a `toolcancel` event with `toolName` to be dispatched by the current Chrome-compatible implementation.
+4. Keep this caller-driven execution signal separate from form reset or tool-registration lifecycle changes, which can also end a declarative invocation.
+
+```js
+const controller = new AbortController();
+const cancelButton = document.querySelector("#cancel-tool");
+const cancelExecution = () => controller.abort();
+cancelButton?.addEventListener("click", cancelExecution, { once: true });
+
+try {
+  await document.modelContext.executeTool(tool, input, {
+    signal: controller.signal,
+  });
+} catch (error) {
+  if (!controller.signal.aborted) {
+    throw error;
+  }
+} finally {
+  cancelButton?.removeEventListener("click", cancelExecution);
+}
+```
+
 ## Example
 
 ```html
