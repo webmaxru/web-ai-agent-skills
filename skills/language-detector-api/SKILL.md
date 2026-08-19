@@ -4,7 +4,7 @@ description: Implements and debugs browser Language Detector API integrations in
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Language Detector API
