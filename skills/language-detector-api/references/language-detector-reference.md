@@ -63,7 +63,7 @@ Behavior guarantees:
 
 * Results are sorted by confidence in descending order.
 * Returned confidence values are between `0` and `1`.
-* Languages are omitted from the returned list if their confidence value is `0`, or if their confidence value is lower than the confidence assigned to `und` (the undetermined result), or once cumulative confidence already exceeds `0.99`.
+* Languages are omitted from the returned list if their confidence value is `0`, or if their confidence value is lower than the confidence assigned to `und` (the undetermined result), or once cumulative confidence reaches or exceeds `0.99`.
 * The final result is always `und`, representing confidence that the text is not in any supported language strongly enough to return more specific candidates.
 * The total confidence of returned results can be less than `1` because low-probability results are filtered out.
 
