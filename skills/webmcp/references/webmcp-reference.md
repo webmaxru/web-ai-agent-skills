@@ -39,6 +39,7 @@ Use this file for the core contract before editing code.
    `inputSchema`: optional JSON Schema object describing the expected input; omit when the tool takes no structured input.
    `execute`: callback invoked with the input object and `ToolExecuteCallbackOptions` (required).
    `annotations.readOnlyHint`: optional boolean, defaulting to false, indicating that the tool does not modify state.
+  `annotations.consequentialHint`: optional boolean, defaulting to false. Starting in Chrome `154.0.8017.0`, set it to true when a tool performs a high-stakes, irreversible, or real-world action so the agent knows to require explicit user confirmation before execution. See the Chromium [implementation change](https://chromiumdash.appspot.com/commit/a1bf6d8347ecd82fae080076f62a61e8795d8e22) and WebMCP [issue #176](https://github.com/webmachinelearning/webmcp/issues/176).
    `annotations.untrustedContentHint`: optional boolean, defaulting to false, indicating that the tool's output contains data untrusted by the registering author.
 4. Starting in Chrome `153.0.8009.0`, the `ToolExecuteCallback` signature is `(input: object, options: ToolExecuteCallbackOptions) => Promise<any>`, and `options.signal` is always present.
 5. The browser creates a fresh execution `AbortController` for each invocation. When the user or agent cancels through the caller's `executeTool(..., { signal })` signal, the tool's execution signal aborts.
@@ -83,6 +84,37 @@ await document.modelContext.registerTool({
 });
 ```
 
+### Consequential Action Example
+
+Set `consequentialHint` to true for actions such as booking travel, transferring funds, making purchases, or deleting data. The hint tells the agent to request explicit user confirmation; it does not replace the page's own confirmation UI, authorization checks, or transaction validation.
+
+```js
+await document.modelContext.registerTool({
+  name: "book_flight",
+  description: "Book a flight for the user with confirmed flight details.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      flightId: { type: "string", description: "ID of the flight to book" },
+      passengers: {
+        type: "number",
+        description: "Number of tickets to purchase",
+      },
+    },
+    required: ["flightId", "passengers"],
+  },
+  annotations: {
+    readOnlyHint: false,
+    consequentialHint: true,
+    untrustedContentHint: false,
+  },
+  execute: async ({ flightId, passengers }) => {
+    // Add the flight booking transaction logic here.
+    return `Booked ${passengers} passenger(s) on flight ${flightId}.`;
+  },
+});
+```
+
 ## Registration Semantics
 
 1. Tool names must be unique within the current model context.
@@ -123,6 +155,7 @@ await document.modelContext.registerTool({
 6. Register tools only while they match the current page state.
 7. Return after the UI is updated so the agent can verify the effect in the visible page.
 8. Prefer explicit business semantics in parameters such as user-facing enums or raw user values instead of opaque identifiers or computed transforms.
+9. Mark high-stakes, irreversible, or real-world actions with `annotations.consequentialHint: true`, and enforce confirmation and authorization in the application independently of the hint.
 
 ## Current Draft Gaps
 

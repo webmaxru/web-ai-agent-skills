@@ -4,7 +4,7 @@ description: Implements and debugs browser WebMCP integrations in JavaScript or 
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.6"
+  version: "1.7"
 ---
 
 # WebMCP
@@ -35,21 +35,22 @@ metadata:
 2. Resolve the model context with the feature-detection pattern `const modelContext = document.modelContext || navigator.modelContext;` and guard subsequent registration on its presence. Prefer `document.modelContext` (the current surface) and keep `navigator.modelContext` only as a fallback for older Chrome 146–149 builds.
 3. Register imperative tools by awaiting `modelContext.registerTool()` inside a `try`/`catch`, using a stable `name` (1–128 ASCII alphanumeric/`_`/`-`/`.` characters), a positive `description`, an object `inputSchema`, and an `execute` callback. On Chrome 151+ the call returns a `Promise<void>` that resolves when the tool is available across the frame tree; `await` keeps the same code working on older builds that registered synchronously.
 4. Set `annotations.readOnlyHint` to `true` only for tools that do not modify state.
-5. Set `annotations.untrustedContentHint` to `true` when the tool's output may contain data from untrusted sources.
-6. Validate business rules inside the tool implementation even when the schema is strict, and return descriptive errors that help the agent retry with corrected input.
-7. Return tool results only after the UI and application state reflect the tool's effect.
-8. On Chrome 153+, accept the always-present `{ signal }` as the second `execute` argument and pass it to cancellable work such as `fetch()`. Treat this execution signal separately from the registration signal.
-9. If tool availability depends on route, selection, or page state, register tools only while they are valid and unregister stale tools by aborting the `AbortController` whose signal was passed to `registerTool()`; during the Chrome 148 transition window, also call `modelContext.unregisterTool?.()` with optional chaining before aborting.
-10. For declarative tools, annotate the target `<form>` with `toolname` and `tooldescription`, and let form controls define the parameter surface.
-11. Use labels or `toolparamdescription` to produce clear parameter descriptions for declarative fields.
-12. Use `toolautosubmit` only when the page should submit automatically after the agent populates the form.
+5. On Chrome `154.0.8017.0`+, set `annotations.consequentialHint` to `true` for tools that perform high-stakes, irreversible, or real-world actions such as booking travel, transferring funds, making purchases, or deleting data. This signals the agent to obtain explicit user confirmation before execution.
+6. Set `annotations.untrustedContentHint` to `true` when the tool's output may contain data from untrusted sources.
+7. Validate business rules inside the tool implementation even when the schema is strict, and return descriptive errors that help the agent retry with corrected input.
+8. Return tool results only after the UI and application state reflect the tool's effect.
+9. On Chrome 153+, accept the always-present `{ signal }` as the second `execute` argument and pass it to cancellable work such as `fetch()`. Treat this execution signal separately from the registration signal.
+10. If tool availability depends on route, selection, or page state, register tools only while they are valid and unregister stale tools by aborting the `AbortController` whose signal was passed to `registerTool()`; during the Chrome 148 transition window, also call `modelContext.unregisterTool?.()` with optional chaining before aborting.
+11. For declarative tools, annotate the target `<form>` with `toolname` and `tooldescription`, and let form controls define the parameter surface.
+12. Use labels or `toolparamdescription` to produce clear parameter descriptions for declarative fields.
+13. Use `toolautosubmit` only when the page should submit automatically after the agent populates the form.
 
 **Step 4: Wire agent-driven UX safely**
 1. Preserve the normal human interaction path even when the page supports agent invocation.
 2. When a tool needs explicit confirmation or a user-facing step, route it through the application's visible UI and existing authorization checks; the current `execute(input, { signal })` contract does not provide a client callback.
 3. When customizing declarative submit handling, call `preventDefault()` before `respondWith()` and return structured validation errors for agent-invoked submits.
 4. Use preview-only events such as `toolactivated`, `toolcancel`, `agentInvoked`, and WebMCP form pseudo-classes only behind compatibility-aware UI logic.
-5. Keep destructive or sensitive actions gated behind visible user confirmation, even if the agent can prepare the input.
+5. Keep destructive or sensitive actions gated behind visible user confirmation and existing authorization checks, even when `annotations.consequentialHint` is `true`; the annotation informs the agent but does not enforce application security.
 6. Keep UI state synchronized so the same page accurately reflects changes caused by human input and tool calls.
 
 **Step 5: Validate behavior**
@@ -61,7 +62,8 @@ metadata:
 6. Use the Model Context Tool Inspector or equivalent preview tooling only as a validation aid, not as a runtime dependency.
 7. Validate deterministic execution first by inspecting the registered tool set and manually invoking the tool with representative arguments when preview tooling is available.
 8. After deterministic execution is correct, validate natural-language routing so descriptions and parameter shapes guide the agent toward the correct tool.
-9. Run the workspace build, typecheck, or tests after editing.
+9. Verify that every high-stakes, irreversible, or real-world imperative tool declares `annotations.consequentialHint: true` and still enforces the application's confirmation and authorization flow.
+10. Run the workspace build, typecheck, or tests after editing.
 
 ## Error Handling
 * If both `document.modelContext` and `navigator.modelContext` are missing, confirm the code is running in a secure browser window context and then check the preview requirements in `references/compatibility.md`.

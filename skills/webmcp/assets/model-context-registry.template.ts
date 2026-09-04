@@ -13,6 +13,7 @@ type ToolDefinition = {
   inputSchema?: JsonSchema;
   annotations?: {
     readOnlyHint?: boolean;
+    consequentialHint?: boolean;
     untrustedContentHint?: boolean;
   };
   execute(
