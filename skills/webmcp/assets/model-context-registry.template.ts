@@ -14,6 +14,7 @@ type ToolDefinition = {
   annotations?: {
     readOnlyHint?: boolean;
     consequentialHint?: boolean;
+    debugging?: boolean;
     untrustedContentHint?: boolean;
   };
   execute(

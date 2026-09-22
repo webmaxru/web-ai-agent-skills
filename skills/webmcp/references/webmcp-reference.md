@@ -39,7 +39,8 @@ Use this file for the core contract before editing code.
    `inputSchema`: optional JSON Schema object describing the expected input; omit when the tool takes no structured input.
    `execute`: callback invoked with the input object and `ToolExecuteCallbackOptions` (required).
    `annotations.readOnlyHint`: optional boolean, defaulting to false, indicating that the tool does not modify state.
-  `annotations.consequentialHint`: optional boolean, defaulting to false. Starting in Chrome `154.0.8017.0`, set it to true when a tool performs a high-stakes, irreversible, or real-world action so the agent knows to require explicit user confirmation before execution. See the Chromium [implementation change](https://chromiumdash.appspot.com/commit/a1bf6d8347ecd82fae080076f62a61e8795d8e22) and WebMCP [issue #176](https://github.com/webmachinelearning/webmcp/issues/176).
+   `annotations.consequentialHint`: optional boolean, defaulting to false. Starting in Chrome `154.0.8017.0`, set it to true when a tool performs a high-stakes, irreversible, or real-world action so the agent knows to require explicit user confirmation before execution. See the Chromium [implementation change](https://chromiumdash.appspot.com/commit/a1bf6d8347ecd82fae080076f62a61e8795d8e22) and WebMCP [issue #176](https://github.com/webmachinelearning/webmcp/issues/176).
+   `annotations.debugging`: optional boolean, defaulting to false. Starting in Chrome `156.0.8067.0`, set it to true only when a tool is intended for debugging and developer tooling rather than end-user interactions so general-purpose and end-user agents can filter it out. The member is named `debugging`, not `debuggingHint`, because it classifies the tool's intended audience instead of describing execution behavior. See the Chromium [implementation change](https://chromiumdash.appspot.com/commit/4ba301ad8c7c1e2190707d80aec6bc8aa63a2671) and WebMCP [PR #253](https://github.com/webmachinelearning/webmcp/pull/253).
    `annotations.untrustedContentHint`: optional boolean, defaulting to false, indicating that the tool's output contains data untrusted by the registering author.
 4. Starting in Chrome `153.0.8009.0`, the `ToolExecuteCallback` signature is `(input: object, options: ToolExecuteCallbackOptions) => Promise<any>`, and `options.signal` is always present.
 5. The browser creates a fresh execution `AbortController` for each invocation. When the user or agent cancels through the caller's `executeTool(..., { signal })` signal, the tool's execution signal aborts.
@@ -106,11 +107,40 @@ await document.modelContext.registerTool({
   annotations: {
     readOnlyHint: false,
     consequentialHint: true,
+    debugging: false,
     untrustedContentHint: false,
   },
   execute: async ({ flightId, passengers }) => {
     // Add the flight booking transaction logic here.
     return `Booked ${passengers} passenger(s) on flight ${flightId}.`;
+  },
+});
+```
+
+### Debugging Tool Example
+
+Set `debugging` to true only for tools intended for inspection, diagnostics, testing frameworks, or developer tooling such as Chrome DevTools AI assistance. It classifies the tool's intended audience rather than its execution behavior and lets general-purpose and end-user agents filter out developer-focused tools. Leave it false or omit it for user-facing tools.
+
+```js
+await document.modelContext.registerTool({
+  name: "getInternalState",
+  description: "Return internal component state for diagnostics and troubleshooting.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      componentId: {
+        type: "string",
+        description: "ID of the component to inspect",
+      },
+    },
+    required: ["componentId"],
+  },
+  annotations: {
+    readOnlyHint: true,
+    debugging: true,
+  },
+  execute: ({ componentId }) => {
+    return myFramework.getState(componentId);
   },
 });
 ```
@@ -156,6 +186,7 @@ await document.modelContext.registerTool({
 7. Return after the UI is updated so the agent can verify the effect in the visible page.
 8. Prefer explicit business semantics in parameters such as user-facing enums or raw user values instead of opaque identifiers or computed transforms.
 9. Mark high-stakes, irreversible, or real-world actions with `annotations.consequentialHint: true`, and enforce confirmation and authorization in the application independently of the hint.
+10. Mark tools intended specifically for inspection, diagnostics, testing, or developer tooling with `annotations.debugging: true`, and leave it false or omit it for user-facing tools.
 
 ## Current Draft Gaps
 

@@ -4,7 +4,7 @@ description: Implements and debugs browser WebMCP integrations in JavaScript or 
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.7"
+  version: "1.8"
 ---
 
 # WebMCP
@@ -36,14 +36,15 @@ metadata:
 3. Register imperative tools by awaiting `modelContext.registerTool()` inside a `try`/`catch`, using a stable `name` (1–128 ASCII alphanumeric/`_`/`-`/`.` characters), a positive `description`, an object `inputSchema`, and an `execute` callback. On Chrome 151+ the call returns a `Promise<void>` that resolves when the tool is available across the frame tree; `await` keeps the same code working on older builds that registered synchronously.
 4. Set `annotations.readOnlyHint` to `true` only for tools that do not modify state.
 5. On Chrome `154.0.8017.0`+, set `annotations.consequentialHint` to `true` for tools that perform high-stakes, irreversible, or real-world actions such as booking travel, transferring funds, making purchases, or deleting data. This signals the agent to obtain explicit user confirmation before execution.
-6. Set `annotations.untrustedContentHint` to `true` when the tool's output may contain data from untrusted sources.
-7. Validate business rules inside the tool implementation even when the schema is strict, and return descriptive errors that help the agent retry with corrected input.
-8. Return tool results only after the UI and application state reflect the tool's effect.
-9. On Chrome 153+, accept the always-present `{ signal }` as the second `execute` argument and pass it to cancellable work such as `fetch()`. Treat this execution signal separately from the registration signal.
-10. If tool availability depends on route, selection, or page state, register tools only while they are valid and unregister stale tools by aborting the `AbortController` whose signal was passed to `registerTool()`; during the Chrome 148 transition window, also call `modelContext.unregisterTool?.()` with optional chaining before aborting.
-11. For declarative tools, annotate the target `<form>` with `toolname` and `tooldescription`, and let form controls define the parameter surface.
-12. Use labels or `toolparamdescription` to produce clear parameter descriptions for declarative fields.
-13. Use `toolautosubmit` only when the page should submit automatically after the agent populates the form.
+6. On Chrome `156.0.8067.0`+, set `annotations.debugging` to `true` only for tools intended specifically for inspection, diagnostics, testing frameworks, or developer tooling such as Chrome DevTools AI assistance. This lets general-purpose and end-user agents identify and filter out developer-focused tools.
+7. Set `annotations.untrustedContentHint` to `true` when the tool's output may contain data from untrusted sources.
+8. Validate business rules inside the tool implementation even when the schema is strict, and return descriptive errors that help the agent retry with corrected input.
+9. Return tool results only after the UI and application state reflect the tool's effect.
+10. On Chrome 153+, accept the always-present `{ signal }` as the second `execute` argument and pass it to cancellable work such as `fetch()`. Treat this execution signal separately from the registration signal.
+11. If tool availability depends on route, selection, or page state, register tools only while they are valid and unregister stale tools by aborting the `AbortController` whose signal was passed to `registerTool()`; during the Chrome 148 transition window, also call `modelContext.unregisterTool?.()` with optional chaining before aborting.
+12. For declarative tools, annotate the target `<form>` with `toolname` and `tooldescription`, and let form controls define the parameter surface.
+13. Use labels or `toolparamdescription` to produce clear parameter descriptions for declarative fields.
+14. Use `toolautosubmit` only when the page should submit automatically after the agent populates the form.
 
 **Step 4: Wire agent-driven UX safely**
 1. Preserve the normal human interaction path even when the page supports agent invocation.
@@ -63,7 +64,8 @@ metadata:
 7. Validate deterministic execution first by inspecting the registered tool set and manually invoking the tool with representative arguments when preview tooling is available.
 8. After deterministic execution is correct, validate natural-language routing so descriptions and parameter shapes guide the agent toward the correct tool.
 9. Verify that every high-stakes, irreversible, or real-world imperative tool declares `annotations.consequentialHint: true` and still enforces the application's confirmation and authorization flow.
-10. Run the workspace build, typecheck, or tests after editing.
+10. Verify that tools intended specifically for inspection, diagnostics, testing, or developer tooling declare `annotations.debugging: true`, and that user-facing tools leave it unset or `false`.
+11. Run the workspace build, typecheck, or tests after editing.
 
 ## Error Handling
 * If both `document.modelContext` and `navigator.modelContext` are missing, confirm the code is running in a secure browser window context and then check the preview requirements in `references/compatibility.md`.

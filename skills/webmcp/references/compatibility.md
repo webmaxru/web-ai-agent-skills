@@ -20,6 +20,7 @@ Use this file when setup, browser support, or preview-only behaviors affect impl
 9. Starting in Chrome `153.0.8009.0`, every imperative `execute` callback receives `{ signal }` as its second argument. Aborting the caller's execution signal propagates cancellation to this signal.
 10. Starting in Chrome `153.0.8009.0`, unregistering a tool no longer cancels its in-flight executions. Registration lifecycle cleanup and per-call execution cancellation are independent.
 11. Starting in Chrome `154.0.8017.0`, `ToolAnnotations` includes `consequentialHint`. Set it to true for high-stakes, irreversible, or real-world actions so agents know to require explicit user confirmation before execution. See the Chromium [implementation change](https://chromiumdash.appspot.com/commit/a1bf6d8347ecd82fae080076f62a61e8795d8e22) and WebMCP [issue #176](https://github.com/webmachinelearning/webmcp/issues/176).
+12. Starting in Chrome `156.0.8067.0`, `ToolAnnotations` includes `debugging`. Set it to true only for tools intended for debugging and developer tooling rather than end-user interactions so general-purpose and end-user agents can filter them out. See the Chromium [implementation change](https://chromiumdash.appspot.com/commit/4ba301ad8c7c1e2190707d80aec6bc8aa63a2671) and WebMCP [PR #253](https://github.com/webmachinelearning/webmcp/pull/253).
 
 ## Execution Context Limits
 
@@ -29,7 +30,7 @@ Use this file when setup, browser support, or preview-only behaviors affect impl
 
 ## Draft Versus Preview Differences
 
-1. The imperative API surface around `document.modelContext` (with the deprecated `navigator.modelContext` fallback), `registerTool()`, tool annotations, and execution cancellation is more stable than the declarative surface. Note that `unregisterTool()` is removed in Chrome 148 in favour of the `AbortSignal` option, the `modelContext` getter moved from `Navigator` to `Document` in Chrome 150, `registerTool()` returns a `Promise<void>` starting in Chrome 151, `execute()` receives `{ signal }` starting in Chrome 153, and `ToolAnnotations` includes `consequentialHint` starting in Chrome 154.
+1. The imperative API surface around `document.modelContext` (with the deprecated `navigator.modelContext` fallback), `registerTool()`, tool annotations, and execution cancellation is more stable than the declarative surface. Note that `unregisterTool()` is removed in Chrome 148 in favour of the `AbortSignal` option, the `modelContext` getter moved from `Navigator` to `Document` in Chrome 150, `registerTool()` returns a `Promise<void>` starting in Chrome 151, `execute()` receives `{ signal }` starting in Chrome 153, and `ToolAnnotations` includes `consequentialHint` starting in Chrome 154 and `debugging` starting in Chrome 156.
 2. Declarative WebMCP is not yet fully specified.
 3. Current preview implementations include additional declarative details for form attributes, submit interception, events, and CSS pseudo-classes.
 4. Keep imperative integrations aligned to the stable API shape, but treat declarative behaviors as compatibility-sensitive features until the spec stabilizes.
