@@ -33,11 +33,25 @@ Use this file when the page already has a form-centric user flow or when agent-d
 
 ## Preview Events And Visual States
 
-1. The preview fires a `toolactivated` event on `window` after an agent populates the form.
-2. The preview fires a `toolcancel` event on `window` when the agent cancels or the form resets.
+1. Starting in Chrome `156.0.8076.0`, `toolactivated` fires on `document.modelContext` when tool execution starts, and `toolcancel` fires there when execution is canceled. Earlier preview builds fire these events on `window`.
+2. Listen on `document.modelContext` when its `ontoolactivated` or `ontoolcancel` property exists, and otherwise listen on `window`; select the target for each event independently. Both events expose `toolName`.
 3. The preview applies `:tool-form-active` to the active tool form.
 4. The preview applies `:tool-submit-active` to the submit control while the agent-driven form interaction is active.
 5. Treat these events and pseudo-classes as preview-only capabilities, not as the portable baseline.
+
+```js
+const targetFor = (type, listener, options) =>
+  (`on${type}` in (document.modelContext ?? {}) ? document.modelContext : window)
+    .addEventListener(type, listener, options);
+
+targetFor("toolactivated", ({ toolName }) => {
+  console.log(`Tool "${toolName}" started execution.`);
+});
+
+targetFor("toolcancel", ({ toolName }) => {
+  console.log(`Tool "${toolName}" execution is cancelled.`);
+});
+```
 
 ## Cancelling Declarative Execution
 

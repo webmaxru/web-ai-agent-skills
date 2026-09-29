@@ -166,7 +166,7 @@ await document.modelContext.registerTool({
 1. `ModelContext` fires a `toolchange` event (via `ontoolchange`) whenever a tool is registered or unregistered in the current model context.
 2. `toolchange` fires on the `ModelContext` of the registering document and propagates to same-origin or explicitly exposed-to documents in the same page tree.
 3. The timing of `toolchange` relative to tasks queued after `registerTool()` is not guaranteed; treat it as asynchronous notification only.
-4. `toolactivated`, `toolcancel`, and the declarative pseudo-classes are preview-only events distinct from `toolchange`; see `references/declarative-api.md` and `references/compatibility.md`.
+4. `toolactivated` (execution started) and `toolcancel` (execution canceled) carry `toolName`. On Chrome `156.0.8076.0`+ they fire on `document.modelContext` (via `ontoolactivated` and `ontoolcancel`); on older preview builds they fire on `window`. Feature-detect the event handler property to choose the listener target; see `references/declarative-api.md` and `references/compatibility.md`. These events and the declarative pseudo-classes remain preview-only, distinct from `toolchange`.
 
 ## Declarative API
 

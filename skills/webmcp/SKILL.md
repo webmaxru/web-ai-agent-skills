@@ -50,7 +50,7 @@ metadata:
 1. Preserve the normal human interaction path even when the page supports agent invocation.
 2. When a tool needs explicit confirmation or a user-facing step, route it through the application's visible UI and existing authorization checks; the current `execute(input, { signal })` contract does not provide a client callback.
 3. When customizing declarative submit handling, call `preventDefault()` before `respondWith()` and return structured validation errors for agent-invoked submits.
-4. Use preview-only events such as `toolactivated`, `toolcancel`, `agentInvoked`, and WebMCP form pseudo-classes only behind compatibility-aware UI logic.
+4. Use preview-only events such as `toolactivated`, `toolcancel`, `agentInvoked`, and WebMCP form pseudo-classes only behind compatibility-aware UI logic. For `toolactivated` and `toolcancel`, read `references/declarative-api.md` and feature-detect their `on*` properties on `document.modelContext` before falling back to `window` for older builds.
 5. Keep destructive or sensitive actions gated behind visible user confirmation and existing authorization checks, even when `annotations.consequentialHint` is `true`; the annotation informs the agent but does not enforce application security.
 6. Keep UI state synchronized so the same page accurately reflects changes caused by human input and tool calls.
 

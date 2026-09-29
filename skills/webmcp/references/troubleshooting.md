@@ -81,8 +81,9 @@
 ## Preview-only events or styles are missing
 
 1. Check whether the implementation actually targets the current Chrome preview.
-2. Treat `toolactivated`, `toolcancel`, `agentInvoked`, `:tool-form-active`, and `:tool-submit-active` as preview-only behavior.
-3. Do not make core application logic depend exclusively on those preview signals.
+2. For `toolactivated` and `toolcancel`, check whether `ontoolactivated` or `ontoolcancel` exists on `document.modelContext`. On Chrome `156.0.8076.0`+ listen on that context; on older builds listen on `window`. Use the feature-detected pattern in `references/declarative-api.md`, not listeners on both targets.
+3. Treat `toolactivated`, `toolcancel`, `agentInvoked`, `:tool-form-active`, and `:tool-submit-active` as preview-only behavior.
+4. Do not make core application logic depend exclusively on those preview signals.
 
 ## Old examples mention removed APIs
 
