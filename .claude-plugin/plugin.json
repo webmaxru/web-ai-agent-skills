@@ -1,7 +1,7 @@
 {
   "name": "web-ai-skills",
   "version": "1.10.1",
-  "description": "Agent skills for browser Web AI APIs (Prompt API, Language Detector, Translator, Writing Assistance, Proofreader, WebMCP, WebNN)",
+  "description": "Agent skills for browser Web AI APIs (Prompt API, Language Detector, Translator, Writing Assistance, Proofreader, WebMCP, WebNN) (workflow smoke test)",
   "author": {
     "name": "Maxim Salnikov"
   },
