@@ -88,6 +88,7 @@ jobs:
       prompt_path: ${{ matrix.prompt_path }}
     secrets:
       COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+      GH_AW_CI_TRIGGER_TOKEN: ${{ secrets.GH_AW_CI_TRIGGER_TOKEN }}
 
   supersede-skill-update-pull-requests:
     needs:
