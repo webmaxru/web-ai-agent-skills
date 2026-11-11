@@ -52,7 +52,7 @@ jobs:
     if: >-
       github.event_name == 'pull_request' ||
       (github.event_name == 'workflow_dispatch' &&
-      (!(inputs.auto_ship || github.actor == 'github-actions[bot]') || vars.AUTO_RELEASE != 'false')) ||
+      (!(inputs.auto_ship || github.event.sender.type != 'User') || vars.AUTO_RELEASE != 'false')) ||
       ((github.event_name == 'push' || github.event_name == 'schedule') && vars.AUTO_RELEASE != 'false')
     permissions:
       actions: write
