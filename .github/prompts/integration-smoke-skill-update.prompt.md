@@ -5,6 +5,6 @@ argument-hint: "No arguments."
 agent: "agent"
 ---
 
-For this temporary workflow integration test, update only `assets/weekly-update-integration-smoke.txt` by replacing its single line `initial` with `verified`. Do not edit any skill files or any other files.
+For this temporary workflow integration test, create only the new file `skills/integration-smoke/assets/weekly-update-smoke.txt` with the single line `verified`. Do not edit any other files.
 
 Create one draft pull request titled `integration-smoke: verify cross-repo weekly caller`, and state in its body that this is a temporary workflow test with no skill content changes.
