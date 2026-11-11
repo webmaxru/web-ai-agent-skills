@@ -13,7 +13,7 @@ on:
 permissions: {}
 
 concurrency:
-  group: weekly-skill-updates
+  group: weekly-skill-updates-${{ github.repository }}
   cancel-in-progress: false
 
 jobs:
@@ -100,3 +100,68 @@ jobs:
       issues: write
       pull-requests: write
     uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-update-supersede.yml@webmaxru-automation-weekly-update-fix
+
+  report-skill-update-failure:
+    needs:
+      - discover-prompts
+      - run-skill-update-prompts
+      - supersede-skill-update-pull-requests
+    if: >-
+      always() &&
+      (needs.discover-prompts.result == 'failure' ||
+       needs.run-skill-update-prompts.result == 'failure' ||
+       needs.supersede-skill-update-pull-requests.result == 'failure')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Create or update the weekly failure issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          script: |
+            const title = '[skill-update] failed weekly skill updates';
+            const marker = '<!-- skill-update-failure -->';
+            const { owner, repo } = context.repo;
+            const needs = JSON.parse(process.env.NEEDS_JSON);
+            const failures = Object.entries(needs)
+              .filter(([, job]) => job.result === 'failure')
+              .map(([name]) => `- \`${name}\` failed`);
+            const body = [
+              marker,
+              'The weekly skill-update workflow failed.',
+              '',
+              `Run: ${process.env.RUN_URL}`,
+              '',
+              'Failed jobs:',
+              ...failures,
+            ].join('\n');
+            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner,
+              repo,
+              state: 'open',
+              per_page: 100,
+            });
+            const prior = openIssues.find((issue) =>
+              !issue.pull_request && issue.title === title && issue.body?.includes(marker)
+            );
+
+            if (prior) {
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: prior.number,
+                body,
+              });
+              core.info(`Updated deduplicated skill-update failure issue #${prior.number}.`);
+            } else {
+              const { data: issue } = await github.rest.issues.create({
+                owner,
+                repo,
+                title,
+                body,
+              });
+              core.info(`Created skill-update failure issue #${issue.number}.`);
+            }
