@@ -9,6 +9,9 @@ on:
         description: Optional single prompt path under .github/prompts/ ending in -skill-update.prompt.md
         required: false
         type: string
+  pull_request:
+    branches:
+      - main
 
 permissions: {}
 
@@ -83,7 +86,7 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    uses: webmaxru/ai-native-dev/.github/workflows/skill-update-worker.lock.yml@main
+    uses: webmaxru/ai-native-dev/.github/workflows/skill-update-worker.lock.yml@107c72893a7ee02a10a5d7f280d92e3d8079e151
     with:
       prompt_path: ${{ matrix.prompt_path }}
     secrets:
@@ -98,4 +101,4 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-update-supersede.yml@main
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-update-supersede.yml@107c72893a7ee02a10a5d7f280d92e3d8079e151
