@@ -1,0 +1,29 @@
+name: Validate Skills
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - ".claude-plugin/plugin.json"
+      - ".github/plugin/plugin.json"
+      - "package.json"
+  push:
+    branches:
+      - main
+    paths:
+      - "skills/**"
+      - ".claude-plugin/plugin.json"
+      - ".github/plugin/plugin.json"
+      - "package.json"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  validate:
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-validate.yml@webmaxru-automation-auto-release
+    with:
+      hub_ref: webmaxru-automation-auto-release

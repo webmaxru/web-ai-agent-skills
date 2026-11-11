@@ -1,0 +1,67 @@
+name: Skill Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "skills/**"
+      - ".claude-plugin/plugin.json"
+      - ".github/plugin/plugin.json"
+      - "package.json"
+  workflow_dispatch:
+    inputs:
+      auto_ship:
+        description: Marks a workflow_dispatch from the approved-update ship workflow
+        required: false
+        default: false
+        type: boolean
+      bump:
+        description: Plugin version bump strategy
+        required: false
+        default: auto
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+      dry_run:
+        description: Preview without changing the repository
+        required: false
+        default: false
+        type: boolean
+      debounce_minutes:
+        description: Delay before release (0 disables the delay)
+        required: false
+        default: 0
+        type: number
+  schedule:
+    - cron: "0 12 * * 1"
+  pull_request:
+    paths:
+      - "skills/**"
+      - ".claude-plugin/plugin.json"
+      - ".github/plugin/plugin.json"
+      - "package.json"
+
+permissions: {}
+
+jobs:
+  release:
+    if: >-
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' &&
+      (!(inputs.auto_ship || github.actor == 'github-actions[bot]') || vars.AUTO_RELEASE != 'false')) ||
+      ((github.event_name == 'push' || github.event_name == 'schedule') && vars.AUTO_RELEASE != 'false')
+    permissions:
+      actions: write
+      contents: write
+      issues: write
+      pull-requests: read
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@webmaxru-automation-auto-release
+    with:
+      bump: ${{ inputs.bump || 'auto' }}
+      dry_run: ${{ github.event_name == 'pull_request' || inputs.dry_run == true }}
+      debounce_minutes: ${{ github.event_name == 'push' && 5 || inputs.debounce_minutes || 0 }}
+      hub_ref: webmaxru-automation-auto-release
