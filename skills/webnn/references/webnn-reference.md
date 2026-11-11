@@ -11,6 +11,8 @@ The W3C WebNN specification at `https://www.w3.org/TR/webnn/` is the authoritati
 * `builder.build()` compiles the graph asynchronously into an `MLGraph`. It can only be called once per builder.
 * `MLContext.createTensor()` creates reusable `MLTensor` objects for graph I/O.
 * `MLContext.createConstantTensor(descriptor, inputData)` creates an immutable constant `MLTensor` for weight data. The constant tensor can be destroyed after `build()` completes.
+* `await MLContext.createExportableTensor(descriptor, gpuDevice)` creates an `MLTensor` that can be handed to the given `GPUDevice` through `exportToGPU()`. It rejects with `NotSupportedError` when the context cannot export to that device (implementation-defined).
+* `MLContext.exportToGPU(tensor)` returns a `GPUBuffer` (usage `STORAGE | COPY_SRC | COPY_DST`) for an exportable tensor. While exported, WebNN operations on that tensor (`dispatch()`, `readTensor()`, `writeTensor()`) throw `TypeError`. Destroying the `GPUBuffer` returns the tensor to WebNN. Export is not guaranteed to be zero-copy (see [§8.3.8](https://www.w3.org/TR/webnn/#api-mlcontext-exporttogpu)).
 * `MLContext.writeTensor()` copies input data into writable tensors.
 * `MLContext.dispatch()` schedules graph execution.
 * `await MLContext.readTensor(tensor)` reads output data back to script as an `ArrayBuffer`.
@@ -23,7 +25,7 @@ The W3C WebNN specification at `https://www.w3.org/TR/webnn/` is the authoritati
 * `accelerated`: boolean (default `true`). When `true`, the platform attempts to use massively parallel hardware such as a GPU or NPU. When `false`, the application prefers CPU inference. `accelerated` has less priority than `powerPreference`; contradictory combinations (e.g., `powerPreference: "high-performance"` with `accelerated: false`) let the implementation choose the best available match.
 * `MLContext.accelerated`: read-only attribute reflecting whether the context uses hardware acceleration.
 * `context.lost`: `Promise<MLContextLostInfo>` that resolves when the execution context becomes invalid. The resolved `MLContextLostInfo` object carries a `message: DOMString` field with a human-readable description of the loss reason.
-* `opSupportLimits()`: reports device-dependent support limits, operator data type coverage, and rank ranges for inputs, constants, and outputs. Note: per §5.1, this API can contribute to fingerprintability; per §8.3.7, it is not intended to add fingerprinting entropy and in current implementations the information can be inferred from the OS and browser version alone. If future implementation diversity warrants it, implementations may bucket capabilities to reduce entropy (see [§8.3.7](https://www.w3.org/TR/webnn/#api-mlcontext-opsupportlimits)).
+* `opSupportLimits()`: reports device-dependent support limits, operator data type coverage, and rank ranges for inputs, constants, and outputs. Note: per §5.1, this API can contribute to fingerprintability; the spec notes its entropy can be reduced by bucketing the distinguishable configurations the API exposes (see [§5.1](https://www.w3.org/TR/webnn/#fingerprinting) and [§8.3.9](https://www.w3.org/TR/webnn/#api-mlcontext-opsupportlimits)).
 
 Note: `MLDeviceType` (`"cpu"` / `"gpu"` / `"npu"`) was removed from the specification (see [#809](https://github.com/webmachinelearning/webnn/pull/809)). Use `accelerated` and `powerPreference` instead.
 
@@ -55,6 +57,7 @@ Use these as property accesses (`operand.dataType`, `operand.shape`), not functi
 ## Integration rules
 
 * WebNN requires a secure context.
+* WebNN is a Permissions Policy policy-controlled feature named `webnn` with a default allowlist of `'self'`. Cross-origin iframes need an explicit `allow="webnn"` grant (see [§7.5](https://www.w3.org/TR/webnn/#permissions-policy-integration)).
 * WebNN surfaces are available in `Window` and all `Worker` contexts (including `DedicatedWorker`, `SharedWorker`, and `ServiceWorker`).
 * `dispatch()` does not report completion. Read output tensors to synchronize with the executed result.
 * Hardware acceleration is a preference. Implementations can partition graphs or fall back per operator.
