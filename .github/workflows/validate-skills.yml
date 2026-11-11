@@ -24,6 +24,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-validate.yml@main
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-validate.yml@webmaxru-automation-auto-release
     with:
-      hub_ref: main
+      hub_ref: webmaxru-automation-auto-release
