@@ -10,10 +10,7 @@ on:
         required: false
         type: string
 
-permissions:
-  actions: read
-  contents: write
-  pull-requests: write
+permissions: {}
 
 concurrency:
   group: weekly-skill-updates
@@ -81,7 +78,24 @@ jobs:
       fail-fast: false
       matrix:
         prompt_path: ${{ fromJson(needs.discover-prompts.outputs.prompt_paths) }}
-    uses: ./.github/workflows/skill-update-worker.lock.yml
+    permissions:
+      actions: read
+      contents: write
+      issues: write
+      pull-requests: write
+    uses: webmaxru/ai-native-dev/.github/workflows/skill-update-worker.lock.yml@107c72893a7ee02a10a5d7f280d92e3d8079e151
     with:
       prompt_path: ${{ matrix.prompt_path }}
-    secrets: inherit
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+
+  supersede-skill-update-pull-requests:
+    needs:
+      - discover-prompts
+      - run-skill-update-prompts
+    if: always() && needs.discover-prompts.result == 'success'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-update-supersede.yml@107c72893a7ee02a10a5d7f280d92e3d8079e151
