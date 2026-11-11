@@ -1,0 +1,19 @@
+name: Repository Health Caller Acceptance
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  health:
+    if: github.event_name == 'workflow_dispatch'
+    permissions:
+      actions: write
+      contents: read
+      issues: write
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-repo-health.yml@562d47231f750e1ea857591d83bda052a89098cb
+    with:
+      hub_ref: 562d47231f750e1ea857591d83bda052a89098cb
