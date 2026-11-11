@@ -59,9 +59,9 @@ jobs:
       contents: write
       issues: write
       pull-requests: read
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@webmaxru-automation-auto-release
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-release.yml@cc1388ab79a680fec0607e9d27f0226c440ece45
     with:
       bump: ${{ inputs.bump || 'auto' }}
       dry_run: ${{ github.event_name == 'pull_request' || inputs.dry_run == true }}
       debounce_minutes: ${{ github.event_name == 'push' && 5 || inputs.debounce_minutes || 0 }}
-      hub_ref: webmaxru-automation-auto-release
+      hub_ref: cc1388ab79a680fec0607e9d27f0226c440ece45

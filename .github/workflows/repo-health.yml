@@ -13,6 +13,6 @@ jobs:
       actions: write
       contents: read
       issues: write
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-repo-health.yml@webmaxru-automation-auto-release
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-repo-health.yml@cc1388ab79a680fec0607e9d27f0226c440ece45
     with:
-      hub_ref: webmaxru-automation-auto-release
+      hub_ref: cc1388ab79a680fec0607e9d27f0226c440ece45
