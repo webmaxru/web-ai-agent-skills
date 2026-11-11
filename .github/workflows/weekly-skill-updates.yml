@@ -83,7 +83,7 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    uses: webmaxru/ai-native-dev/.github/workflows/skill-update-worker.lock.yml@main
+    uses: webmaxru/ai-native-dev/.github/workflows/skill-update-worker.lock.yml@webmaxru-automation-weekly-update-fix
     with:
       prompt_path: ${{ matrix.prompt_path }}
     secrets:
@@ -99,4 +99,4 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-update-supersede.yml@main
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-skill-update-supersede.yml@webmaxru-automation-weekly-update-fix
