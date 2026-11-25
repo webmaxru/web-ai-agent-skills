@@ -5,7 +5,7 @@
 1. Confirm the code runs in a secure browser window context rather than on the server or in a worker.
 2. Confirm the target browser build exposes the Prompt API.
 3. For Chrome localhost testing, confirm the required built-in AI flags are enabled.
-4. For Edge preview testing, confirm the browser is Canary or Dev on a supported version and that the preview flag is enabled.
+4. For Edge preview testing, confirm Edge 158 or later and that the **Prompt API** flag in `edge://flags` is enabled (or a valid origin-trial token is present).
 5. Confirm that the current frame is allowed by the `language-model` permissions-policy.
 6. If broader support is required, progressively load the project's maintained Prompt API polyfill.
 7. Fall back to a non-AI experience when neither native support nor the approved polyfill path is available.
@@ -17,7 +17,7 @@
 3. Confirm that the browser implementation supports the Prompt API features the app is requesting.
 4. Confirm that the device meets the current browser's hardware and storage requirements.
 5. If `expectedInputs` includes `{ type: "audio" }` on Chrome, confirm the device has a GPU with strictly more than 4 GB of VRAM; Chrome does not support audio input on CPU-only configurations.
-6. On Edge, if the device performance class is Medium or Low and Phi-4-mini is unavailable, test whether enabling the **Enable prerelease on-device language model** flag (Edge 150.0.4070+) makes Aion-1.0-Instruct available; that model supports CPU-only inferencing on lower-class hardware.
+6. On Edge, check `edge://on-device-internals` for a **Device performance class** of Medium or greater, confirm **On-device AI** is enabled under **Settings** > **Copilot and AI**, and confirm the `GenAILocalFoundationalModelSettings` and `ComponentUpdatesEnabled` enterprise policies do not block the model download.
 
 ## `availability()` returns `downloadable`
 
