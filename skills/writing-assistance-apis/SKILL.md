@@ -4,7 +4,7 @@ description: Implements and debugs browser Summarizer, Writer, and Rewriter inte
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Writing Assistance APIs
