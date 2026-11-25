@@ -11,14 +11,15 @@ Writing Assistance APIs remain browser-specific and rollout-sensitive. Treat sup
 
 ## Microsoft Edge preview notes
 
-* Microsoft Edge documents the Writing Assistance APIs as a developer preview in Canary or Dev starting with version `138.0.3309.2`.
-* The Summarizer API is enabled by default in Edge 138.0.3309.2 and later. The Writer and Rewriter APIs require enabling flags in `edge://flags`:
-  * In Edge 150 and later: **Writer API for on-device language model** and **Rewriter API for on-device language model**.
-  * In Edge 138–149: **Writer API for Phi mini** and **Rewriter API for Phi mini**.
-* Edge preview guidance currently targets Windows 10 or 11 and macOS 13.3+.
-* Edge preview guidance currently requires at least 20 GB free storage, at least 5.5 GB VRAM, and an unmetered connection for the initial model download (for the default Phi-4-mini model).
-* Edge exposes device-readiness details through `edge://on-device-internals`. Check the **Device performance class** value to determine which model path is available.
-* Edge 150.0.4070 and later also supports the prerelease **Aion-1.0-Instruct** model, which runs on devices with a Medium or Low device performance class (including devices with no discrete GPU, via CPU-inferencing). Enable it via the **Enable prerelease on-device language model** flag in `edge://flags`. When enabled, Aion-1.0-Instruct overrides Phi-4-mini as the default model for the Writing Assistance APIs.
+* Microsoft Edge documents the Writing Assistance APIs as a developer preview starting with version 158. Earlier Edge builds (138–157) used the Phi-4-mini model and different flag names; treat those as legacy and re-verify behavior on them.
+* In Edge 158 and later, enable the **Summarizer API**, **Writer API**, and **Rewriter API** flags in `edge://flags` as needed, then restart. In Canary, Dev, and Beta, enabling a flag also turns on **On-device AI** under **Settings** > **Copilot and AI**, which is otherwise disabled by default in those channels.
+* Edge uses the built-in Aion Instruct model (2.3B parameters).
+* Edge preview guidance currently targets Windows 10 or 11, macOS 13.3+, and 64-bit (x64) Linux with Vulkan GPU drivers on Edge 159 or later.
+* Edge preview guidance currently requires at least 20 GB free storage, at least 3 GB VRAM, and an unmetered connection for the initial model download. The model is not downloaded on metered connections.
+* If available storage drops below 5 GB, Edge deletes the model.
+* The model is unavailable when **On-device AI** is disabled, when the `GenAILocalFoundationalModelSettings` or `ComponentUpdatesEnabled` enterprise policies block the download, or when the device fails hardware, disk, or network requirements.
+* Edge exposes device-readiness details through `edge://on-device-internals`. A **Device performance class** of Medium or greater indicates support.
+* Edge 158 and later inserts an invisible watermark into generated text. Account for it when rendering, parsing, or converting output, and keep any AI-content marking obligations in mind before stripping it.
 
 ## Chrome notes
 
@@ -46,7 +47,7 @@ Writing Assistance APIs remain browser-specific and rollout-sensitive. Treat sup
 
 ## Known browser-spec discrepancies
 
-* Microsoft Edge documentation (as of version 138+) uses `"tl;dr"` (with semicolon) for the Summarizer `type` option while the W3C Community Group specification uses `"tldr"` (no semicolon). The spec value `"tldr"` is authoritative for cross-browser code; test against the target browser if using the Edge Phi-4-mini preview.
+* Microsoft Edge documentation (as of version 158) uses `"tl;dr"` (with semicolon) for the Summarizer `type` option while the W3C Community Group specification uses `"tldr"` (no semicolon). The spec value `"tldr"` is authoritative for cross-browser code; test against the target browser when targeting Edge.
 
 ## TypeScript and typings
 
