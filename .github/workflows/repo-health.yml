@@ -1,0 +1,18 @@
+name: Repository Health
+
+on:
+  schedule:
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  health:
+    permissions:
+      actions: write
+      contents: read
+      issues: write
+    uses: webmaxru/ai-native-dev/.github/workflows/reusable-repo-health.yml@webmaxru-automation-auto-release
+    with:
+      hub_ref: webmaxru-automation-auto-release
