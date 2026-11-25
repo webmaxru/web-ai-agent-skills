@@ -53,8 +53,8 @@
 
 ## `registerTool()` throws `TypeError` or serialization errors
 
-1. Check that `inputSchema` is plain JSON-compatible data.
-2. Remove circular references from `inputSchema`.
+1. Check that `inputSchema` and `outputSchema` are plain JSON-compatible objects (not strings such as `""`).
+2. Remove circular references from either schema.
 3. Remove custom serialization logic that returns `undefined` or non-JSON values.
 4. Reduce the schema to a minimal plain object, then add properties back incrementally.
 

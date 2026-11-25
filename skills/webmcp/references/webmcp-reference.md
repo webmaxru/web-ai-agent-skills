@@ -37,6 +37,7 @@ Use this file for the core contract before editing code.
    `title`: optional `USVString` human-readable label shown in user-agent UI; should be localized; does not affect agent routing.
    `description`: natural-language description of what the tool does and when to use it (required).
    `inputSchema`: optional JSON Schema object describing the expected input; omit when the tool takes no structured input.
+   `outputSchema`: optional JSON Schema object describing the tool's result; omit or leave `undefined` when not needed. Like `inputSchema`, it must be an object (for example `inputSchema: ""` throws `TypeError` during dictionary conversion) and must serialize to JSON.
    `execute`: callback invoked with the input object and `ToolExecuteCallbackOptions` (required).
    `annotations.readOnlyHint`: optional boolean, defaulting to false, indicating that the tool does not modify state.
    `annotations.consequentialHint`: optional boolean, defaulting to false. Starting in Chrome `154.0.8017.0`, set it to true when a tool performs a high-stakes, irreversible, or real-world action so the agent knows to require explicit user confirmation before execution. See the Chromium [implementation change](https://chromiumdash.appspot.com/commit/a1bf6d8347ecd82fae080076f62a61e8795d8e22) and WebMCP [issue #176](https://github.com/webmachinelearning/webmcp/issues/176).
@@ -160,6 +161,14 @@ await document.modelContext.registerTool({
 11. Starting in Chrome `151.0.7922.0`, `registerTool()` returns a `Promise<void>` that resolves once the tool is registered across the frame tree and is visible to `getTools()` in other documents. Earlier builds returned `void` synchronously. Cross-origin iframe integration shares tools across the frame tree, which makes registration fundamentally asynchronous even though the failure conditions remain locally known.
 12. The failure conditions above are known synchronously (they depend only on the local per-document tool cache), but they may surface either as a synchronous throw or as a Promise rejection depending on the build. Await `registerTool()` inside a `try`/`catch` so both paths are caught; this also stays forward compatible with future asynchronous failure cases.
 13. Starting in Chrome `153.0.8009.0`, removing a registration does not abort an execution that has already started.
+
+## Discovery and Execution
+
+1. `modelContext.getTools(options)` returns a promise for the `Tool` objects visible to the calling document. It rejects with `InvalidStateError` when the document is not fully active and `NotAllowedError` when the `tools` Permissions Policy feature is denied.
+2. `options.fromOrigins` is an optional array of origins to query in addition to same-origin documents; an empty array limits results to same-origin documents. Invalid origins reject with `SecurityError`.
+3. A `Tool` exposes read-only `name`, `title`, `description`, `inputSchema`, `outputSchema`, `annotations`, `origin`, and `source`. `source` is the registering window's `WindowProxy`, or `null` once that document has navigated away or is no longer fully active.
+4. `modelContext.executeTool(tool, input, { signal })` runs a tool obtained from `getTools()`. It rejects with `NotFoundError` when the tool has since been unregistered, was replaced by a same-name tool with a different identity, or is not exposed to the caller's origin; the same error is used for both cases so callers cannot probe for hidden tools. Re-fetch tools with `getTools()` and retry instead of caching `Tool` objects across route or state changes.
+5. `modelContext.waitForToolsUntil(promise)` tells tool consumers that the document is still registering or updating tools asynchronously. Consumers wait until the promise settles (fulfilled or rejected) or an implementation-defined timeout elapses before reading the tool set. It throws `InvalidStateError` when the document is not fully active and `NotAllowedError` when the `tools` Permissions Policy feature is denied. Use it when tools are registered after an async load so agents do not read a partial tool set; feature-detect it because older preview builds do not expose it.
 
 ## Events
 
