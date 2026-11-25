@@ -2,7 +2,7 @@
 
 ![Web AI Agent Skills banner](assets/repo-banner.svg)
 
-A maintained collection of agent skills for modern browser Web AI APIs: Prompt API, Language Detector API, Translator API, Writing Assistance APIs, Proofreader API, WebMCP, and WebNN.
+A maintained collection of agent skills for modern browser Web AI APIs: Prompt API, Language Detector API, Translator API, Writing Assistance APIs, Proofreader API, Semantic Embedder API, WebMCP, and WebNN.
 
 Standards and preview implementations still shift, browser behavior changes across milestones, and many ecosystem examples go stale quickly. These skills reduce that drift so generated or assisted code stays aligned with the current public specification state instead of relying on outdated snippets or guesswork.
 
@@ -21,6 +21,7 @@ The repository follows the agentskills.io style: lean `SKILL.md` files, progress
   - [Translator API Skill](#translator-api-skill)
   - [Writing Assistance APIs Skill](#writing-assistance-apis-skill)
   - [Proofreader API Skill](#proofreader-api-skill)
+  - [Semantic Embedder API Skill](#semantic-embedder-api-skill)
   - [WebMCP Skill](#webmcp-skill)
   - [WebNN Skill](#webnn-skill)
 - [Supporting Assets](#supporting-assets)
@@ -240,6 +241,39 @@ Its support files are split by purpose:
 - `assets/proofreader-session.template.ts` for a reusable typed session wrapper template
 - `scripts/find-proofreader-targets.mjs` for deterministic scanning of likely web entry points and Proofreader API markers
 
+### Semantic Embedder API Skill
+
+`skills/semantic-embedder-api` is scoped to browser Semantic Embedder API integrations in JavaScript or TypeScript web apps. This API is an Early Preview Program (EPP) feature gated behind a manual Chrome Canary flag, not a general-availability API.
+
+Install with APM:
+
+```bash
+apm install webmaxru/web-ai-agent-skills/skills/semantic-embedder-api
+```
+
+Install with npm:
+
+```bash
+npx skills add webmaxru/web-ai-agent-skills --skill semantic-embedder-api
+```
+
+It covers:
+
+- identifying the correct browser app surface for on-device text-embedding work
+- confirming secure-context, desktop-platform, Canary-version, and EPP flag viability before code changes
+- implementing guarded `availability()` and `create()` flows with download progress handling
+- wiring single-string and batched `embed()` calls with per-call `taskType` selection for similarity, retrieval, classification, and clustering
+- validating embedding-space versioning risk, cleanup through `destroy()`, and EPP-specific compatibility limits
+
+Its support files are split by purpose:
+
+- `references/semantic-embedder-reference.md` for API surface, `taskType` semantics, batching rules, and embedding-space comparability constraints
+- `references/examples.md` for support detection, monitored creation, similarity scoring, batched retrieval indexing, and cleanup patterns
+- `references/compatibility.md` for EPP flag requirements, Canary version gates, platform limits, and versioning guidance
+- `references/troubleshooting.md` for missing globals, flag/version mismatches, misplaced `taskType` usage, and stale-embedding symptoms
+- `assets/semantic-embedder-session.template.ts` for a reusable typed session wrapper template
+- `scripts/find-semantic-embedder-targets.mjs` for deterministic scanning of likely web entry points and Semantic Embedder API markers
+
 ### WebMCP Skill
 
 `skills/webmcp` is scoped to browser WebMCP integrations in JavaScript or TypeScript web apps.
@@ -392,6 +426,14 @@ node skills/proofreader-api/scripts/find-proofreader-targets.mjs .
 ```
 
 The scanner prioritizes common browser entry points and reports existing Proofreader API markers such as `Proofreader`, `proofread()`, correction-detail options, and the `proofreader` permissions-policy token.
+
+### Scan a Workspace for Semantic Embedder Targets
+
+```bash
+node skills/semantic-embedder-api/scripts/find-semantic-embedder-targets.mjs .
+```
+
+The scanner prioritizes common browser entry points and reports existing Semantic Embedder API markers such as `SemanticEmbedder`, `.embed()`, `taskType`, and the shape of a returned `embeddings[0].values` vector.
 
 ### Scan a Workspace for WebMCP Targets
 
