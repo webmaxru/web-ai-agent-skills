@@ -4,7 +4,7 @@ description: Implements and debugs browser Prompt API integrations in JavaScript
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Prompt API

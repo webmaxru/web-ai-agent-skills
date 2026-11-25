@@ -4,7 +4,7 @@ description: Implements and debugs browser Web Neural Network API integrations i
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # WebNN

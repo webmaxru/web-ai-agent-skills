@@ -4,7 +4,7 @@ description: Implements and debugs browser Proofreader API integrations in JavaS
 license: MIT
 metadata:
   author: webmaxru
-  version: "1.4"
+  version: "1.5"
 ---
 
 # Proofreader API
