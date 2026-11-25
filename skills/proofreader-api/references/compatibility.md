@@ -18,13 +18,14 @@ Proofreader API support remains browser-specific, preview-sensitive, and hardwar
 
 ## Microsoft Edge preview notes
 
-* Microsoft Edge documents the Proofreader API as a developer preview in Canary or Dev starting with version `142`.
-* Edge uses the Phi-4-mini model (Microsoft) for the Proofreader API preview.
-* Edge currently documents preview enablement through the `Proofreader API for Phi mini` flag.
-* Edge preview guidance currently targets Windows 10 or 11 and macOS 13.3+.
-* Edge preview guidance currently requires at least 20 GB free storage, at least 5.5 GB VRAM, and an unmetered connection for the initial model download.
-* If available storage drops below 10 GB after the initial download, Edge deletes the model to free space for other browser features; the model must be re-downloaded when space is restored.
-* Edge exposes device-readiness details through `edge://on-device-internals`, where `Device performance class` should be `High` or greater.
+* Microsoft Edge documents the Proofreader API as a developer preview starting with version `158`, for local testing on the developer's device only.
+* Edge uses the Aion Instruct model (2.3B parameter SLM from Microsoft) for the Proofreader API preview.
+* Edge documents preview enablement through the `Proofreader API` flag at `edge://flags`; in Canary, Dev, and Beta the flag also enables the **On-device AI** setting under **Settings** > **Copilot and AI**, which is otherwise off by default in those channels.
+* Edge preview guidance targets Windows 10 or 11, macOS 13.3+, and 64-bit x64 Linux with Vulkan GPU drivers on Edge `159` or later.
+* Edge preview guidance requires at least 20 GB free storage, at least 3 GB VRAM, and an unmetered connection; the model is not downloaded on metered connections.
+* If available storage drops below 5 GB after the initial download, Edge deletes the model to free space for other browser features; the model must be re-downloaded when space is restored.
+* The model is unavailable when **On-device AI** is disabled, when the `GenAILocalFoundationalModelSettings` or `ComponentUpdatesEnabled` enterprise policies block the download, or when the device fails hardware, disk, or network requirements.
+* Edge exposes device-readiness details through `edge://on-device-internals`, where `Device performance class` should be `Medium` or greater.
 
 ## Chrome notes
 
