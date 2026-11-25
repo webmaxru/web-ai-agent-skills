@@ -24,7 +24,7 @@ metadata:
 2. Read `references/examples.md` when choosing between a direct WebNN graph flow and an adapter around an existing browser ML runtime.
 3. Read `references/compatibility.md` when native support, preview flags, device behavior, or backend differences matter.
 4. Read `references/troubleshooting.md` when context creation, graph build, tensor readback, or device selection fails.
-5. Verify that the feature runs in a secure context and in a `Window` or `Worker` context (`DedicatedWorker`, `SharedWorker`, or `ServiceWorker`).
+5. Verify that the feature runs in a secure context and in a `Window` or `Worker` context (`DedicatedWorker`, `SharedWorker`, or `ServiceWorker`), and that the `webnn` Permissions Policy feature is allowed when running inside a cross-origin iframe.
 6. If the feature must run on the server, train models, or depend on cloud inference, stop and explain the platform mismatch.
 7. Choose device intent deliberately: use `powerPreference: "high-performance"` for throughput, `powerPreference: "low-power"` for power-efficient acceleration, or `accelerated: false` to prefer CPU inference for maximum reach.
 8. Treat `accelerated` and `powerPreference` as preferences, not guarantees. Browser backends can still partition graphs or fall back per operator.
